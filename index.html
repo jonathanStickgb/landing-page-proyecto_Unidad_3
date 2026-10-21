@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Landing Page interactiva y responsiva - Proyecto Unidad 3 UPTC">
+    <title>Landing Page - Proyecto Final</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Encabezado y Navegación -->
+    <header class="header">
+        <nav class="nav-container">
+            <a href="#" class="logo">UPTC<span>Dev</span></a>
+            <button class="hamburger" id="hamburger-btn" aria-label="Abrir menú">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#caracteristicas">Características</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+                <li><button id="theme-toggle" class="btn-theme">🌙</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Sección Hero Principal -->
+    <section id="inicio" class="hero">
+        <div class="hero-content">
+            <h1>Soluciones Web Modernas e Interactivas</h1>
+            <p>Desarrollo web frontend con HTML5, CSS3 y JavaScript optimizado para la gestión de proyectos profesionales.</p>
+            <a href="#contacto" class="btn-primary">Empezar Ahora</a>
+        </div>
+    </section>
+
+    <!-- Sección de Características -->
+    <section id="caracteristicas" class="features">
+        <h2>Características Principales</h2>
+        <div class="features-grid">
+            <div class="card">
+                <h3>Diseño Responsivo</h3>
+                <p>Adaptado para cualquier dispositivo móvil, tablet o escritorio.</p>
+            </div>
+            <div class="card">
+                <h3>Gestión Kanban</h3>
+                <p>Flujo de trabajo optimizado bajo metodologías ágiles en GitHub Projects.</p>
+            </div>
+            <div class="card">
+                <h3>Persistencia Local</h3>
+                <p>Uso de LocalStorage para guardar tus datos e interacciones.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Contacto -->
+    <section id="contacto" class="contact">
+        <h2>Contáctanos</h2>
+        <form id="contact-form" action="https://formspree.io/f/xknlqwbw" method="POST" class="form">
+            <div class="form-group">
+                <label for="nombre">Nombre Completo</label>
+                <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre">
+            </div>
+            <div class="form-group">
+                <label for="email">Correo Electrónico</label>
+                <input type="email" id="email" name="email" required placeholder="tu@correo.com">
+            </div>
+            <div class="form-group">
+                <label for="mensaje">Mensaje</label>
+                <textarea id="mensaje" name="mensaje" rows="4" required placeholder="Escribe tu mensaje..."></textarea>
+            </div>
+            <button type="submit" class="btn-submit">Enviar Mensaje</button>
+        </form>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Proyecto Unidad 3 UPTC - Jonathan Stick & María Medina. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
