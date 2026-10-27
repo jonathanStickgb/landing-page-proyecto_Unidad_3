@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. Lógica del Modo Oscuro (Dark Mode Toggle)
+    //// 2. Lógica del Modo Oscuro (Dark Mode Toggle)
     const themeToggleBtn = document.getElementById('theme-toggle');
     const htmlElement = document.documentElement;
 
