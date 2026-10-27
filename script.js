@@ -1,7 +1,5 @@
-(() => {
-    'use strict';
-
-    // Manejo del Menú Hamburguesa en Dispositivos Móviles
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Lógica del Menú Hamburguesa
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const navMenu = document.getElementById('nav-menu');
 
@@ -11,47 +9,17 @@
         });
     }
 
-    // Toggle Modo Oscuro / Claro con Persistencia en LocalStorage
+    // 2. Lógica del Modo Oscuro (Dark Mode Toggle)
     const themeToggleBtn = document.getElementById('theme-toggle');
-    const currentTheme = localStorage.getItem('theme') || 'light';
+    const htmlElement = document.documentElement;
 
-    document.documentElement.setAttribute('data-theme', currentTheme);
     if (themeToggleBtn) {
-        themeToggleBtn.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
-
         themeToggleBtn.addEventListener('click', () => {
-            const activeTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
-
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            themeToggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            htmlElement.setAttribute('data-theme', newTheme);
+            themeToggleBtn.textContent = newTheme === 'light' ? '🌙' : '☀️';
         });
     }
-
-    // Autoguardado en LocalStorage para el Formulario de Contacto
-    const contactForm = document.getElementById('contact-form');
-    const nombreInput = document.getElementById('nombre');
-    const emailInput = document.getElementById('email');
-
-    if (contactForm) {
-        // Cargar datos guardados previamente
-        if (nombreInput) nombreInput.value = localStorage.getItem('form_nombre') || '';
-        if (emailInput) emailInput.value = localStorage.getItem('form_email') || '';
-
-        // Guardar mientras el usuario escribe
-        nombreInput?.addEventListener('input', (e) => {
-            localStorage.setItem('form_nombre', e.target.value);
-        });
-
-        emailInput?.addEventListener('input', (e) => {
-            localStorage.setItem('form_email', e.target.value);
-        });
-
-        // Limpiar almacenamiento al enviar
-        contactForm.addEventListener('submit', () => {
-            localStorage.removeItem('form_nombre');
-            localStorage.removeItem('form_email');
-        });
-    }
-})();
+});
