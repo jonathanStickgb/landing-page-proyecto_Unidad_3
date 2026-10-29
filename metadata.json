@@ -1,0 +1,6 @@
+{
+  "name": "Java & AI Day Boyacá 2026",
+  "description": "Landing page oficial del evento Java & AI Day Boyacá 2026 en la UPTC Tunja. Arquitectura moderna de la JVM, Inteligencia Artificial Generativa, ponentes internacionales y alianzas comunitarias.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

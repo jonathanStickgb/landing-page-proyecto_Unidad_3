@@ -1,59 +1,21 @@
-HTML
-<!DOCTYPE html>
-<html lang="es" data-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Optimización SEO y Open Graph -->
-    <meta name="description" content="Landing Page profesional - Proyecto Unidad 3 UPTC">
-    <meta property="og:title" content="Portafolio UPTC">
-    <meta property="og:description" content="Landing Page interactiva creada por el equipo de desarrollo.">
-    <meta property="og:type" content="website">
-    
-    <title>Landing Page - Proyecto Unidad 3</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <!-- Navegación -->
-    <header class="header">
-        <nav class="nav-container">
-            <a href="#" class="logo">UPTC<span>Dev</span></a>
-            <button class="hamburger" id="hamburger-btn" aria-label="Abrir menú">
-                <span></span><span></span><span></span>
-            </button>
-            <ul class="nav-menu" id="nav-menu">
-                <li><a href="#inicio">Inicio</a></li>
-                <li><a href="#caracteristicas">Características</a></li>
-                <li><a href="#contacto">Contacto</a></li>
-                <li><button id="theme-toggle" class="btn-theme">🌙</button></li>
-            </ul>
-        </nav>
-    </header>
-
-    <!-- Hero Section -->
-    <section id="inicio" class="hero">
-        <div class="hero-content">
-            <h1>Bienvenido a nuestro Proyecto</h1>
-            <p>Desarrollo web colaborativo con las mejores prácticas.</p>
-            <a href="#contacto" class="btn-primary">Contáctanos</a>
-        </div>
-    </section>
-
-    <!-- Formulario de Contacto (Preparado para Formspree) -->
-    <section id="contacto" class="contacto">
-        <h2>Ponte en contacto</h2>
-        <form id="contact-form" action="https://formspree.io/f/TU_ENDPOINT_AQUI" method="POST">
-            <input type="text" id="nombre" name="nombre" placeholder="Tu Nombre" required>
-            <input type="email" id="email" name="email" placeholder="Tu Correo" required>
-            <button type="submit" class="btn-primary">Enviar Mensaje</button>
-        </form>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2026 Proyecto Unidad 3 UPTC. Todos los derechos reservados.</p>
-    </footer>
-
-    <script src="script.js"></script>
-</body>
+<!doctype html>
+<html lang="es" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Java & AI Day Boyacá 2026</title>
+    <meta name="description" content="Landing page oficial del evento Java & AI Day Boyacá 2026 en la UPTC Tunja. Arquitectura moderna de la JVM, Inteligencia Artificial Generativa, ponentes internacionales y alianzas comunitarias." />
+    <meta property="og:title" content="Java & AI Day Boyacá 2026" />
+    <meta property="og:description" content="Landing page oficial del evento Java & AI Day Boyacá 2026 en la UPTC Tunja. Arquitectura moderna de la JVM, Inteligencia Artificial Generativa, ponentes internacionales y alianzas comunitarias." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-[#0a0705] text-[#f4efe8] antialiased selection:bg-[#f89820] selection:text-black min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
+
