@@ -1,69 +1,111 @@
-# Landing Page - Proyecto Unidad 3 (UPTC)
-## Java & AI Day Boyacá 2026
+# Java & AI Day Boyacá 2026 — Proyecto Unidad 3 (UPTC)
 
-![GitHub Pages Status](https://img.shields.io/badge/GitHub%20Pages-Active-success?style=flat-square&logo=github)
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
-![License](https://img.shields.io/badge/License-MIT-blue.svg)
-
-
-Este proyecto es una **Landing Page profesional, interactiva y responsiva** desarrollada como evidencia práctica del flujo de trabajo profesional utilizando Git, GitHub, ramas de características (*Feature Branch Workflow*) y metodologías ágiles (Kanban) en la Escuela de Ingeniería de Sistemas y Computación de la **UPTC**.
-
----
-
-## 🚀 Enlace del Sitio en Vivo (GitHub Pages)
-Visita el sitio desplegado en vivo aquí:  
-👉 **[https://jonathanstickgb.github.io/landing-page-proyecto_Unidad_3/](https://jonathanstickgb.github.io/landing-page-proyecto_Unidad_3/)**
+> **Repositorio Oficial:** `jonathanStickgb/landing-page-proyecto_Unidad_3`  
+> **Rama Principal:** `main`  
+> **Institución:** Universidad Pedagógica y Tecnológica de Colombia (UPTC) — Sede Central Tunja  
+> **Facultad:** Facultad de Ingeniería  
+> **Escuela:** Escuela de Ingeniería de Sistemas y Computación  
+> **Evento:** Java & AI Day Boyacá 2026  
+> **Fechas Oficiales:** 4 y 5 de Diciembre, 2026  
+> **Lugar:** Auditorio Paraninfo San Jerónimo, Tunja, Boyacá  
 
 ---
 
-## 👥 Equipo de Trabajo
-* **María Medina** ([@mariamedina-cmd](https://github.com/mariamedina-cmd)):  
-  *Arquitectura HTML semántica, Accesibilidad Web (WCAG) y optimización SEO / Open Graph.*
-* **Natalia Cruz** ([@nataliacruzmoreno](https://github.com/nataliacruzmoreno)):  
-  *Interactividad en JavaScript, API IntersectionObserver, animaciones Reveal-on-Scroll y estilos CSS.*
-* **Jonathan Stick Fuentes** ([@jonathanStickgb](https://github.com/jonathanStickgb)):  
-  *Documentación, configuración del repositorio, flujo de ramas Git Flow y despliegue en GitHub Pages.*
+## 👥 Equipo de Desarrollo y Roles (Git Flow)
+
+| Desarrollador / Estudiante | Usuario GitHub | Rol Principal & Responsabilidades |
+| :--- | :--- | :--- |
+| **María Medina** | [`@mariamedina-cmd`](https://github.com/mariamedina-cmd) | **Arquitectura HTML, Accesibilidad (WCAG AA) & SEO**: Maquetación semántica, metaetiquetas Open Graph, contraste visual y estructura base. |
+| **Natalia Cruz** | [`@nataliacruzmoreno`](https://github.com/nataliacruzmoreno) | **Interactividad JS, Animaciones & Estilos**: API `IntersectionObserver` (`.reveal-card`, `.revealed`), sistema de variables CSS y diseño responsive. |
+| **Jonathan Stick Fuentes** | [`@jonathanStickgb`](https://github.com/jonathanStickgb) | **DevOps, Despliegue & Git Flow**: Administración del repositorio, flujo de ramas (*Feature Branch Workflow*), metodología Kanban y GitHub Pages. |
 
 ---
 
-## 🌟 Nuevas Características Implementadas
+## 🚀 Características del Proyecto
 
-### 1. Fondo Temático Java & IA con Malla IDE
-* Reemplazo del fondo plano por una paleta de **gradientes profundos espresso** (`#0a0705` y `#120d0a`).
-* Acentos oficiales en **naranja Java (`#f89820`)** y **verde neón IA (`#00e676`)**.
-* Malla geométrica decorativa en CSS (`.bg-ide-grid`) inspirada en la grilla y números de línea de un editor/IDE de código.
-
-### 2. Animaciones al Scroll en Ponentes (IntersectionObserver)
-* Implementación de la API moderna `IntersectionObserver` en `script.js`.
-* Clases CSS `.reveal-card` y `.revealed` para activar un desplazamiento suave vertical (*fade-in + translate-up*) de manera individual y escalonada (`delay-1`, `delay-2`, `delay-3`).
-
-### 3. Sección "Organizan y Apoyan" (Tarjetas con Borde Punteado)
-* Réplica de tarjetas con **bordes punteados (`border: 2px dashed rgba(248, 152, 32, 0.35)`)** sobre fondo crema/dorado tenue adaptado al tema oscuro.
-* Alianzas con la **UPTC**, **Java Community Colombia (JUG)**, **Boyacá Devs** y la **Red Colombiana de Inteligencia Artificial (RedIA)**.
-
-### 4. Modo Oscuro / Claro y Formulario de Contacto
-* Toggle dinámico de tema con atributo `data-theme` y persistencia en `localStorage`.
-* Formulario de registro/contacto preparado para integración con endpoint de **Formspree**.
+1. **Paleta Temática Java & IA (Dark Theme Espresso)**:
+   - Fondo oscuro café tostado `#0a0705` y `#120d0a`.
+   - Acentos Java naranja `#f89820` y verde neón IA `#00e676`.
+   - Malla sutil decorativa estilo IDE/código.
+2. **Animaciones Reveal-on-Scroll**:
+   - Tarjetas de ponentes animadas dinámicamente mediante la API nativa de JavaScript `IntersectionObserver` (sin dependencias externas pesadas).
+3. **Sección "Organizan y Apoyan"**:
+   - Tarjetas con bordes segmentados (*dashed*) dorados sobre fondo espresso/crema tenue, destacando la UPTC, Boyacá Devs y JUG Colombia.
+4. **Base de Datos Independiente `MARIAB`**:
+   - Persistencia local en el navegador mediante `localStorage` con soporte CRUD para acreditar participantes presenciales (Paraninfo) y virtuales.
+   - Script SQL standalone (`schema_MARIAB.sql`) compatible con PostgreSQL / MariaDB para despliegue en servidor.
+5. **Generación Manual**:
+   - Totalmente ejecutable de manera local haciendo doble clic en `index.html` o levantando un servidor estático.
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
-* **HTML5 Semántico**: Estructura accesible, metadatos y tarjetas sociales Open Graph.
-* **CSS3 Moderno**: Variables CSS (tokens de diseño), Flexbox, CSS Grid y animaciones de compositor.
-* **JavaScript (Vanilla ES6+)**: API `IntersectionObserver`, manipulación del DOM y eventos asíncronos.
-* **Git & GitHub**: Ramas de características (`feature/*`), Pull Requests y despliegue continuo con GitHub Pages.
+## 📂 Estructura de la Carpeta
+
+```text
+github_repo_ready/
+├── index.html              # Documento HTML5 semántico accesible
+├── styles.css              # Hojas de estilo con tokens CSS y animaciones
+├── script.js               # Lógica interactiva, IntersectionObserver y BD MARIAB
+├── schema_MARIAB.sql       # Script DDL de PostgreSQL con RLS y datos de prueba
+├── setup_manual_mariab.sh  # Script bash automatizado para Docker / psql
+├── README.md               # Esta documentación técnica
+├── .gitignore              # Configuración de exclusión de Git
+└── LICENSE                 # Licencia MIT de código abierto
+```
 
 ---
 
-## 📋 Instrucciones de Ejecución Local
-1. Clonar el repositorio:
+## 🛠️ Cómo Ejecutar este Proyecto
+
+### 1. Ejecución Frontend Inmediata
+Simplemente abre el archivo `index.html` en tu navegador web favorito (Google Chrome, Firefox, Edge, Safari). No requiere `node_modules` ni instalación previa.
+
+O usando un servidor local rápido:
+```bash
+# Con Python 3
+python -m http.server 8080
+
+# Con npx serve
+npx serve .
+```
+
+### 2. Generación Manual de la Base de Datos MARIAB
+Puedes crear la base de datos PostgreSQL localmente en 1 segundo usando Docker:
+
+```bash
+# 1. Levantar contenedor con base de datos MARIAB
+docker run --name postgres-mariab \
+  -e POSTGRES_DB=MARIAB \
+  -e POSTGRES_USER=mariab_admin \
+  -e POSTGRES_PASSWORD=mariab_tech_2026 \
+  -p 5432:5432 -d postgres:16-alpine
+
+# 2. Ejecutar el script DDL
+docker exec -i postgres-mariab psql -U mariab_admin -d MARIAB < schema_MARIAB.sql
+```
+
+O si tienes `psql` instalado en tu máquina:
+```bash
+psql -U postgres -c "CREATE DATABASE \"MARIAB\";"
+psql -U postgres -d MARIAB -f schema_MARIAB.sql
+```
+
+---
+
+## 🌐 Despliegue en GitHub Pages
+
+1. Sube estos archivos a la rama `main` de tu repositorio:
    ```bash
-   git clone https://github.com/jonathanStickgb/landing-page-proyecto_Unidad_3.git
+   git add .
+   git commit -m "feat: landing page final Java & AI Day Boyacá 2026 con BD MARIAB"
+   git push origin main
    ```
-2. Entrar al directorio del proyecto:
-   ```bash
-   cd landing-page-proyecto_Unidad_3
-   ```
-3. Abrir `index.html` en el navegador o ejecutar con la extensión *Live Server* de Visual Studio Code.
+2. En GitHub, ve a **Settings** > **Pages**.
+3. En **Source**, selecciona `Deploy from a branch` y escoge la rama `main` (carpeta `/root`).
+4. Guarda los cambios. Tu sitio estará disponible en:  
+   `https://jonathanstickgb.github.io/landing-page-proyecto_Unidad_3/`
+
+---
+
+## 📜 Licencia
+Este proyecto fue desarrollado con fines educativos y comunitarios bajo la licencia MIT. © 2026 Universidad Pedagógica y Tecnológica de Colombia (UPTC).
