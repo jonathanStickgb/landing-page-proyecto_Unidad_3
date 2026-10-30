@@ -1,4 +1,5 @@
-# Landing Page - Proyecto Final (Unidad 3)
+# Landing Page - Proyecto Unidad 3 (UPTC)
+## Java & AI Day Boyacá 2026
 
 ![GitHub Pages Status](https://img.shields.io/badge/GitHub%20Pages-Active-success?style=flat-square&logo=github)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
@@ -6,35 +7,63 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
-> **Sitio Web Desplegado:** [Ver Landing Page en GitHub Pages](https://jonathanstickgb.github.io/landing-page-proyecto_Unidad_3/)
+
+Este proyecto es una **Landing Page profesional, interactiva y responsiva** desarrollada como evidencia práctica del flujo de trabajo profesional utilizando Git, GitHub, ramas de características (*Feature Branch Workflow*) y metodologías ágiles (Kanban) en la Escuela de Ingeniería de Sistemas y Computación de la **UPTC**.
 
 ---
 
-## 📌 Descripción del Producto
-Esta Landing Page es una solución web interactiva, moderna y completamente responsiva desarrollada como parte de la entrega final de la Unidad 3 de la UPTC. El proyecto demuestra buenas prácticas de desarrollo web frontend, gestión de proyectos con GitHub Projects, persistencia de datos local y consumo de servicios remotos.
+## 🚀 Enlace del Sitio en Vivo (GitHub Pages)
+Visita el sitio desplegado en vivo aquí:  
+👉 **[https://jonathanstickgb.github.io/landing-page-proyecto_Unidad_3/](https://jonathanstickgb.github.io/landing-page-proyecto_Unidad_3/)**
+
+---
+
+## 👥 Equipo de Trabajo
+* **María Medina** ([@mariamedina-cmd](https://github.com/mariamedina-cmd)):  
+  *Arquitectura HTML semántica, Accesibilidad Web (WCAG) y optimización SEO / Open Graph.*
+* **Natalia Cruz** ([@nataliacruzmoreno](https://github.com/nataliacruzmoreno)):  
+  *Interactividad en JavaScript, API IntersectionObserver, animaciones Reveal-on-Scroll y estilos CSS.*
+* **Jonathan Stick Fuentes** ([@jonathanStickgb](https://github.com/jonathanStickgb)):  
+  *Documentación, configuración del repositorio, flujo de ramas Git Flow y despliegue en GitHub Pages.*
+
+---
+
+## 🌟 Nuevas Características Implementadas
+
+### 1. Fondo Temático Java & IA con Malla IDE
+* Reemplazo del fondo plano por una paleta de **gradientes profundos espresso** (`#0a0705` y `#120d0a`).
+* Acentos oficiales en **naranja Java (`#f89820`)** y **verde neón IA (`#00e676`)**.
+* Malla geométrica decorativa en CSS (`.bg-ide-grid`) inspirada en la grilla y números de línea de un editor/IDE de código.
+
+### 2. Animaciones al Scroll en Ponentes (IntersectionObserver)
+* Implementación de la API moderna `IntersectionObserver` en `script.js`.
+* Clases CSS `.reveal-card` y `.revealed` para activar un desplazamiento suave vertical (*fade-in + translate-up*) de manera individual y escalonada (`delay-1`, `delay-2`, `delay-3`).
+
+### 3. Sección "Organizan y Apoyan" (Tarjetas con Borde Punteado)
+* Réplica de tarjetas con **bordes punteados (`border: 2px dashed rgba(248, 152, 32, 0.35)`)** sobre fondo crema/dorado tenue adaptado al tema oscuro.
+* Alianzas con la **UPTC**, **Java Community Colombia (JUG)**, **Boyacá Devs** y la **Red Colombiana de Inteligencia Artificial (RedIA)**.
+
+### 4. Modo Oscuro / Claro y Formulario de Contacto
+* Toggle dinámico de tema con atributo `data-theme` y persistencia en `localStorage`.
+* Formulario de registro/contacto preparado para integración con endpoint de **Formspree**.
 
 ---
 
 ## 🛠️ Tecnologías Utilizadas
-- **HTML5 Semántico:** Estructura limpia y accesible.
-- **CSS3 Moderno:** Variables CSS (`:root`), Flexbox, CSS Grid y Media Queries.
-- **JavaScript Vanilla (ES6+):** Modularización con IIFE, almacenamiento con `LocalStorage` y validaciones en tiempo real.
-- **Git & GitHub:** Control de versiones con *Conventional Commits* y flujo Kanban en *GitHub Projects*.
-- **Formspree:** Servicio de gestión y envío de formularios.
+* **HTML5 Semántico**: Estructura accesible, metadatos y tarjetas sociales Open Graph.
+* **CSS3 Moderno**: Variables CSS (tokens de diseño), Flexbox, CSS Grid y animaciones de compositor.
+* **JavaScript (Vanilla ES6+)**: API `IntersectionObserver`, manipulación del DOM y eventos asíncronos.
+* **Git & GitHub**: Ramas de características (`feature/*`), Pull Requests y despliegue continuo con GitHub Pages.
 
 ---
 
-## 🔄 Metodología de Desarrollo (5 Fases - AVIA)
-El proyecto se desarrolló bajo una metodología estructurada en 5 fases de ciclo continuo:
-1. **Fase 1: Planificación y Kanban:** Definición de la arquitectura, desglose de backlog e historias de usuario en GitHub Projects.
-2. **Fase 2: Maquetación Semántica y Design Tokens:** Creación del HTML5 base y configuración del sistema de tokens visuales en CSS.
-3. **Fase 3: Lógica e Interactividad (AVIA):** Desarrollo de scripts JS aplicando el ciclo **A**nalizar, **V**alidar, **I**ntervenir y **A**justar.
-4. **Fase 4: Optimización y Accesibilidad:** Auditorías de rendimiento con Google Lighthouse y corrección de responsive design.
-5. **Fase 5: Despliegue y Documentación:** Publicación en GitHub Pages y entrega del informe técnico reflexivo.
-
----
-
-## 🚀 Instrucciones de Instalación y Uso
-1. **Clonar el repositorio:**
+## 📋 Instrucciones de Ejecución Local
+1. Clonar el repositorio:
    ```bash
-   git clone [https://github.com/jonathanStickgb/landing-page-proyecto_Unidad_3.git](https://github.com/jonathanStickgb/landing-page-proyecto_Unidad_3.git)
+   git clone https://github.com/jonathanStickgb/landing-page-proyecto_Unidad_3.git
+   ```
+2. Entrar al directorio del proyecto:
+   ```bash
+   cd landing-page-proyecto_Unidad_3
+   ```
+3. Abrir `index.html` en el navegador o ejecutar con la extensión *Live Server* de Visual Studio Code.

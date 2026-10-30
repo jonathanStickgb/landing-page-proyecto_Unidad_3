@@ -1,59 +1,527 @@
-HTML
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Optimización SEO y Open Graph -->
-    <meta name="description" content="Landing Page profesional - Proyecto Unidad 3 UPTC">
-    <meta property="og:title" content="Portafolio UPTC">
-    <meta property="og:description" content="Landing Page interactiva creada por el equipo de desarrollo.">
-    <meta property="og:type" content="website">
     
-    <title>Landing Page - Proyecto Unidad 3</title>
+    <!-- Optimización SEO y Open Graph para Redes Sociales -->
+    <meta name="description" content="Java & AI Day Boyacá 2026 - Proyecto Unidad 3 UPTC. Landing page oficial con animaciones reveal-on-scroll, diseño temático Java/IA y sección de alianzas.">
+    <meta property="og:title" content="Java & AI Day Boyacá 2026 | UPTCDev">
+    <meta property="og:description" content="Encuentro de Java moderno e Inteligencia Artificial en el Auditorio Mayor UPTC Tunja. Desarrollado por María Medina, Natalia Cruz y Jonathan Stick GB.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jonathanstickgb.github.io/landing-page-proyecto_Unidad_3/">
+    
+    <title>Java & AI Day Boyacá 2026 | UPTCDev - Proyecto Unidad 3</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Hoja de Estilos Principal -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Malla decorativa estilo IDE & Resplandor temático de fondo -->
+    <div class="bg-ide-grid"></div>
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
     <!-- Navegación -->
     <header class="header">
         <nav class="nav-container">
-            <a href="#" class="logo">UPTC<span>Dev</span></a>
-            <button class="hamburger" id="hamburger-btn" aria-label="Abrir menú">
+            <a href="#inicio" class="logo">
+                <div class="logo-badge">☕</div>
+                <div class="logo-text">UPTC<span>Dev</span> <small>· Java & AI</small></div>
+            </a>
+            
+            <button class="hamburger" id="hamburger-btn" aria-label="Abrir menú de navegación">
                 <span></span><span></span><span></span>
             </button>
+            
             <ul class="nav-menu" id="nav-menu">
                 <li><a href="#inicio">Inicio</a></li>
-                <li><a href="#caracteristicas">Características</a></li>
+                <li><a href="#tematicas">Temáticas</a></li>
+                <li><a href="#ponentes">Ponentes</a></li>
+                <li><a href="#alianzas">Alianzas</a></li>
+                <li><a href="#agenda">Agenda</a></li>
+                <li><a href="#equipo">Equipo UPTC</a></li>
                 <li><a href="#contacto">Contacto</a></li>
-                <li><button id="theme-toggle" class="btn-theme">🌙</button></li>
+                <li><button id="theme-toggle" class="btn-theme" title="Alternar Modo Claro / Oscuro" aria-label="Cambiar tema">🌙</button></li>
+                <li><a href="#contacto" class="btn-primary">Asegurar Entrada</a></li>
             </ul>
         </nav>
     </header>
 
-    <!-- Hero Section -->
-    <section id="inicio" class="hero">
-        <div class="hero-content">
-            <h1>Bienvenido a nuestro Proyecto</h1>
-            <p>Desarrollo web colaborativo con las mejores prácticas.</p>
-            <a href="#contacto" class="btn-primary">Contáctanos</a>
-        </div>
-    </section>
+    <main>
+        <!-- ================= HERO SECTION ================= -->
+        <section id="inicio" class="hero">
+            <div class="container hero-grid">
+                <div class="hero-text-content">
+                    <div class="meta-strip">
+                        <span>📅 14 de Noviembre de 2026</span>
+                        <span class="sep">·</span>
+                        <span class="highlight-green">📍 Auditorio Mayor UPTC, Tunja</span>
+                        <span class="sep">·</span>
+                        <span>Acceso Gratuito con Registro</span>
+                    </div>
+                    
+                    <h1>
+                        El Encuentro de <span class="text-orange">Java Moderno</span> y la <span class="text-green">Inteligencia Artificial</span>
+                    </h1>
+                    
+                    <p class="hero-desc">
+                        La cumbre técnica más importante de Boyacá. Conecta con arquitectos de software, líderes de <strong>JUG Colombia</strong>, docentes de la <strong>UPTC</strong> y especialistas en Virtual Threads, Spring AI y modelos locales en la JVM.
+                    </p>
+                    
+                    <div class="hero-actions">
+                        <a href="#contacto" class="btn-primary btn-large">Registrarme Gratis</a>
+                        <a href="#ponentes" class="btn-secondary btn-large">Ver Ponentes</a>
+                    </div>
+                    
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">800+</span>
+                            <span class="stat-label">Asistentes Esperados</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number text-orange">12+</span>
+                            <span class="stat-label">Keynotes & Talleres</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number text-green">8</span>
+                            <span class="stat-label">Comunidades Aliadas</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Certificado UPTC</span>
+                        </div>
+                    </div>
+                </div>
 
-    <!-- Formulario de Contacto (Preparado para Formspree) -->
-    <section id="contacto" class="contacto">
-        <h2>Ponte en contacto</h2>
-        <form id="contact-form" action="https://formspree.io/f/TU_ENDPOINT_AQUI" method="POST">
-            <input type="text" id="nombre" name="nombre" placeholder="Tu Nombre" required>
-            <input type="email" id="email" name="email" placeholder="Tu Correo" required>
-            <button type="submit" class="btn-primary">Enviar Mensaje</button>
-        </form>
-    </section>
+                <!-- IDE Code Preview (Malla y sintaxis Java + AI) -->
+                <div class="ide-wrapper">
+                    <div class="ide-card">
+                        <div class="ide-header">
+                            <div class="ide-controls">
+                                <span class="dot dot-red"></span>
+                                <span class="dot dot-yellow"></span>
+                                <span class="dot dot-green"></span>
+                            </div>
+                            <span class="ide-tab-title">SpringAiBoyacaPipeline.java</span>
+                            <span class="ide-badge">JVM 25</span>
+                        </div>
+                        <pre class="ide-code"><code><span class="comment">// 1. Orquestación de Agentes y RAG con Spring AI</span>
+<span class="keyword">@RestController</span>
+<span class="keyword">@RequestMapping</span>(<span class="string">"/api/boyaca-ai"</span>)
+<span class="keyword">public class</span> <span class="class-name">BoyacaAiController</span> {
+
+    <span class="keyword">private final</span> ChatClient chatClient;
+    <span class="keyword">private final</span> VectorStore vectorStore;
+
+    <span class="keyword">public</span> <span class="class-name">BoyacaAiController</span>(ChatClient.Builder b, VectorStore s) {
+        <span class="keyword">this</span>.chatClient = b.defaultSystem(
+            <span class="string">"Asistente oficial Java & AI Day UPTC Tunja"</span>
+        ).build();
+        <span class="keyword">this</span>.vectorStore = s;
+    }
+
+    <span class="keyword">@PostMapping</span>(<span class="string">"/query"</span>)
+    <span class="keyword">public</span> ResponseEntity&lt;String&gt; ask(<span class="keyword">@RequestBody</span> String q) {
+        <span class="comment">// Virtual Threads para baja latencia</span>
+        <span class="keyword">return</span> ResponseEntity.ok(chatClient.prompt().user(q).call().content());
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TEMÁTICAS CLAVE ================= -->
+        <section id="tematicas" class="section-padded bg-surface">
+            <div class="container">
+                <div class="section-header text-center">
+                    <span class="section-kicker">Ejes Temáticos</span>
+                    <h2 class="section-title">Tecnologías de Vanguardia</h2>
+                    <p class="section-subtitle">
+                        Contenido técnico riguroso enfocado en el ecosistema Java empresarial y la inteligencia artificial moderna.
+                    </p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon orange-glow">☕</div>
+                        <span class="feature-tag">01. Rendimiento JVM</span>
+                        <h3>Java 25 & Virtual Threads</h3>
+                        <p>Arquitectura Loom, concurrencia estructurada, valores acotados (Scoped Values) y benchmarking del recolector ZGC.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon green-glow">🧠</div>
+                        <span class="feature-tag text-green">02. Inteligencia Artificial</span>
+                        <h3>Spring AI & LangChain4j</h3>
+                        <p>Integración de LLMs en la JVM, bases de datos vectoriales con pgvector, pipelines RAG e inferencia con ONNX Runtime.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon orange-glow">⚡</div>
+                        <span class="feature-tag">03. Nube y Despliegue</span>
+                        <h3>GraalVM Native Image</h3>
+                        <p>Compilación AOT (Ahead-of-Time) para microservicios de arranque casi instantáneo y mínimo consumo de memoria.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon green-glow">🏛️</div>
+                        <span class="feature-tag text-green">04. Academia y Región</span>
+                        <h3>Innovación & Ecosistema Boyacá</h3>
+                        <p>Presentación de proyectos de investigación del semillero de la UPTC y vinculación con la industria tecnológica global.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PONENTES (REVEAL-ON-SCROLL CON INTERSECTIONOBSERVER) ================= -->
+        <!--
+          REQUERIMIENTO:
+          IntersectionObserver con clases CSS (.reveal-card y .revealed)
+          para animar cada tarjeta de ponente con fade-in + translate-up escalonado.
+        -->
+        <section id="ponentes" class="section-padded">
+            <div class="container">
+                <div class="section-header text-center">
+                    <span class="section-kicker">Efecto Reveal-on-Scroll</span>
+                    <h2 class="section-title">Conferencistas Destacados</h2>
+                    <p class="section-subtitle">
+                        Líderes de la industria, Java Champions e investigadores de la Universidad Pedagógica y Tecnológica de Colombia.
+                    </p>
+                </div>
+
+                <div class="speakers-grid">
+                    <!-- Ponente 1 -->
+                    <div class="reveal-card delay-1">
+                        <div class="speaker-card-inner">
+                            <span class="speaker-track-badge">Keynote Speaker</span>
+                            <h3 class="speaker-name">Ing. Carlos Mendoza</h3>
+                            <div class="speaker-role">Java Platform Architect & Java Champion</div>
+                            <div class="speaker-org">Red Hat & JUG Colombia</div>
+                            
+                            <div class="speaker-talk-box">
+                                <span class="talk-label">Conferencia Magistral:</span>
+                                <h4 class="talk-title">"Java 25 & Virtual Threads a Escala Masiva: Concurrencia de Próxima Generación"</h4>
+                                <p class="talk-desc">Modelos de concurrencia bajo cargas masivas, latencias de submilisegundos y Project Loom.</p>
+                            </div>
+                            
+                            <div class="speaker-tags">
+                                <span>#Java25</span>
+                                <span>#VirtualThreads</span>
+                                <span>#Loom</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ponente 2 -->
+                    <div class="reveal-card delay-2">
+                        <div class="speaker-card-inner">
+                            <span class="speaker-track-badge track-ai">Track IA & LLMs</span>
+                            <h3 class="speaker-name">Dra. Sofía Ramírez</h3>
+                            <div class="speaker-role">Investigadora Senior en Inteligencia Artificial</div>
+                            <div class="speaker-org">UPTC - Grupo de Investigación Sistemas Inteligentes</div>
+                            
+                            <div class="speaker-talk-box">
+                                <span class="talk-label">Conferencia Magistral:</span>
+                                <h4 class="talk-title">"Modelos Fundacionales y Spring AI: Construyendo Pipelines RAG en Producción"</h4>
+                                <p class="talk-desc">Arquitectura Retrieval-Augmented Generation en Java, bases vectoriales y cuantización local.</p>
+                            </div>
+                            
+                            <div class="speaker-tags">
+                                <span>#SpringAI</span>
+                                <span>#RAG</span>
+                                <span>#UPTC</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ponente 3 -->
+                    <div class="reveal-card delay-3">
+                        <div class="speaker-card-inner">
+                            <span class="speaker-track-badge">Track Nube & ML</span>
+                            <h3 class="speaker-name">Elena Torres Gómez</h3>
+                            <div class="speaker-role">Staff ML & Cloud Platform Engineer</div>
+                            <div class="speaker-org">Globant / Boyacá Devs</div>
+                            
+                            <div class="speaker-talk-box">
+                                <span class="talk-label">Conferencia Magistral:</span>
+                                <h4 class="talk-title">"Inferencia de Redes Neuronales en la JVM: ONNX Runtime y LangChain4j"</h4>
+                                <p class="talk-desc">Ejecución de modelos de visión y lenguaje directamente en entornos empresariales JVM.</p>
+                            </div>
+                            
+                            <div class="speaker-tags">
+                                <span>#ONNX</span>
+                                <span>#LangChain4j</span>
+                                <span>#MLOps</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECCIÓN "ORGANIZAN Y APOYAN" (BORDES PUNTEADOS DASHED) ================= -->
+        <!--
+          REQUERIMIENTO:
+          Réplica estructurada y estilizada de las tarjetas con bordes punteados (dashed)
+          sobre fondo crema/dorado tenue adaptada al tema oscuro de la landing.
+        -->
+        <section id="alianzas" class="section-padded bg-surface">
+            <div class="container">
+                <div class="section-header text-center">
+                    <span class="section-kicker">Ecosistema Colaborativo</span>
+                    <h2 class="section-title">Organizan y Apoyan</h2>
+                    <p class="section-subtitle">
+                        La unión de la academia, comunidades tecnológicas independientes y el sector productivo de Boyacá.
+                    </p>
+                </div>
+
+                <div class="alliances-grid">
+                    <!-- Tarjeta 1: UPTC -->
+                    <div class="alliance-card">
+                        <div class="alliance-top">
+                            <span class="alliance-badge">Organizador Anfitrión</span>
+                            <div class="alliance-logo-box">UPTC</div>
+                            <h3 class="alliance-name">Universidad Pedagógica y Tecnológica de Colombia</h3>
+                            <p class="alliance-desc">
+                                Facultad de Ingeniería y Escuela de Ingeniería de Sistemas y Computación. Sede central Tunja.
+                            </p>
+                        </div>
+                        <div class="alliance-footer">
+                            <span>Sede Central Tunja</span>
+                            <a href="https://www.uptc.edu.co" target="_blank" rel="noopener">uptc.edu.co ↗</a>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 2: JUG Colombia -->
+                    <div class="alliance-card">
+                        <div class="alliance-top">
+                            <span class="alliance-badge">Comunidad Co-organizadora</span>
+                            <div class="alliance-logo-box">JUG</div>
+                            <h3 class="alliance-name">Java Community Colombia (JUG)</h3>
+                            <p class="alliance-desc">
+                                La mayor comunidad nacional de desarrollo sobre la JVM, difusora de open source y Java Champions.
+                            </p>
+                        </div>
+                        <div class="alliance-footer">
+                            <span>+6,200 Miembros</span>
+                            <a href="https://jugcolombia.org" target="_blank" rel="noopener">jugcolombia.org ↗</a>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 3: Boyacá Devs -->
+                    <div class="alliance-card">
+                        <div class="alliance-top">
+                            <span class="alliance-badge">Comunidad Regional</span>
+                            <div class="alliance-logo-box">BOY</div>
+                            <h3 class="alliance-name">Boyacá Devs Community</h3>
+                            <p class="alliance-desc">
+                                Red de ingenieros de Boyacá dedicada a descentralizar la formación de alto nivel tecnológico.
+                            </p>
+                        </div>
+                        <div class="alliance-footer">
+                            <span>+1,800 Desarrolladores</span>
+                            <a href="https://boyacadevs.org" target="_blank" rel="noopener">boyacadevs.org ↗</a>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 4: RedIA -->
+                    <div class="alliance-card">
+                        <div class="alliance-top">
+                            <span class="alliance-badge">Aliado Académico</span>
+                            <div class="alliance-logo-box">RedIA</div>
+                            <h3 class="alliance-name">Red Colombiana de Inteligencia Artificial</h3>
+                            <p class="alliance-desc">
+                                Red científica universitaria dedicada a la investigación, desarrollo y ética algorítmica en el país.
+                            </p>
+                        </div>
+                        <div class="alliance-footer">
+                            <span>35 Universidades</span>
+                            <a href="https://rediacolombia.org" target="_blank" rel="noopener">rediacolombia.org ↗</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= AGENDA ================= -->
+        <section id="agenda" class="section-padded">
+            <div class="container">
+                <div class="section-header text-center">
+                    <span class="section-kicker">Cronograma · 14 de Noviembre</span>
+                    <h2 class="section-title">Agenda del Evento</h2>
+                    <p class="section-subtitle">Jornada completa de conferencias, paneles y talleres prácticos.</p>
+                </div>
+
+                <div class="agenda-timeline">
+                    <div class="agenda-row">
+                        <div class="agenda-time">08:00 - 08:45 AM</div>
+                        <div class="agenda-content">
+                            <h4>Acreditación & Café Boyacense de Bienvenida</h4>
+                            <p>Hall del Auditorio Mayor UPTC Tunja. Entrega de identificaciones y networking.</p>
+                        </div>
+                    </div>
+                    <div class="agenda-row highlight-row">
+                        <div class="agenda-time text-orange">08:45 - 09:45 AM</div>
+                        <div class="agenda-content">
+                            <span class="badge-mini">Keynote de Apertura</span>
+                            <h4>Java 25 & Virtual Threads a Escala Masiva</h4>
+                            <p>Ing. Carlos Mendoza (Java Champion · Red Hat & JUG Colombia)</p>
+                        </div>
+                    </div>
+                    <div class="agenda-row">
+                        <div class="agenda-time text-green">09:45 - 10:45 AM</div>
+                        <div class="agenda-content">
+                            <h4>Spring AI y Retrieval-Augmented Generation (RAG) en Producción</h4>
+                            <p>Dra. Sofía Ramírez (Docente e Investigadora UPTC Tunja)</p>
+                        </div>
+                    </div>
+                    <div class="agenda-row">
+                        <div class="agenda-time">10:45 - 11:15 AM</div>
+                        <div class="agenda-content">
+                            <h4>Coffee Break & Muestra de Posters de Semilleros UPTC</h4>
+                            <p>Exhibición de proyectos de grado en Inteligencia Artificial y Sistemas Distribuidos.</p>
+                        </div>
+                    </div>
+                    <div class="agenda-row">
+                        <div class="agenda-time text-green">11:15 - 12:15 PM</div>
+                        <div class="agenda-content">
+                            <h4>Inferencia de Redes Neuronales en la JVM con ONNX Runtime</h4>
+                            <p>Elena Torres Gómez (Staff ML & Cloud Platform Engineer · Globant / Boyacá Devs)</p>
+                        </div>
+                    </div>
+                    <div class="agenda-row highlight-row">
+                        <div class="agenda-time text-orange">04:30 - 05:30 PM</div>
+                        <div class="agenda-content">
+                            <span class="badge-mini">Clausura</span>
+                            <h4>Panel: El Futuro del Ingeniero de Software en la Era de la IA</h4>
+                            <p>Conclusiones con representantes de UPTC, JUG Colombia, Boyacá Devs y entrega de certificados.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= EQUIPO DE TRABAJO (PROYECTO UNIDAD 3 UPTC) ================= -->
+        <section id="equipo" class="section-padded bg-surface">
+            <div class="container">
+                <div class="team-container">
+                    <span class="section-kicker">Ingeniería de Sistemas y Computación · UPTC</span>
+                    <h2 class="section-title">Equipo de Desarrollo — Proyecto Unidad 3</h2>
+                    <p class="section-subtitle">
+                        Desarrollo colaborativo en GitHub siguiendo metodología ágil Kanban y ramas de características (Feature Branch Workflow).
+                    </p>
+
+                    <div class="team-grid">
+                        <div class="team-member-card">
+                            <div class="avatar-box">MM</div>
+                            <h3>María Medina</h3>
+                            <div class="member-role">Arquitectura HTML, Accesibilidad & SEO</div>
+                            <p>Estructura semántica del documento, contraste, navegación accesible y meta-etiquetas Open Graph.</p>
+                            <a href="https://github.com/mariamedina-cmd" target="_blank" rel="noopener">@mariamedina-cmd ↗</a>
+                        </div>
+
+                        <div class="team-member-card">
+                            <div class="avatar-box green-glow">NC</div>
+                            <h3>Natalia Cruz</h3>
+                            <div class="member-role">Interactividad JS, Animaciones & Estilos</div>
+                            <p>Implementación de la API IntersectionObserver, clases reveal-card y revealed, y efectos visuales de scroll.</p>
+                            <a href="https://github.com/nataliacruzmoreno" target="_blank" rel="noopener">@nataliacruzmoreno ↗</a>
+                        </div>
+
+                        <div class="team-member-card">
+                            <div class="avatar-box">JS</div>
+                            <h3>Jonathan Stick Fuentes</h3>
+                            <div class="member-role">Documentación, Despliegue & Git Flow</div>
+                            <p>Configuración del repositorio en GitHub, despliegue en GitHub Pages y coordinación de integración.</p>
+                            <a href="https://github.com/jonathanStickgb" target="_blank" rel="noopener">@jonathanStickgb ↗</a>
+                        </div>
+                    </div>
+
+                    <!-- Banner de Enlaces a GitHub -->
+                    <div class="repo-banner">
+                        <div>
+                            <strong>Repositorio Oficial en GitHub:</strong>
+                            <a href="https://github.com/jonathanStickgb/landing-page-proyecto_Unidad_3" target="_blank" rel="noopener">
+                                github.com/jonathanStickgb/landing-page-proyecto_Unidad_3
+                            </a>
+                        </div>
+                        <div class="repo-links">
+                            <a href="https://github.com/jonathanStickgb/landing-page-proyecto_Unidad_3" target="_blank" class="btn-secondary" rel="noopener">Ver Rama Main en GitHub</a>
+                            <a href="https://jonathanstickgb.github.io/landing-page-proyecto_Unidad_3/" target="_blank" class="btn-primary" rel="noopener">Sitio en GitHub Pages</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= CONTACTO Y REGISTRO (FORMSPREE) ================= -->
+        <section id="contacto" class="section-padded">
+            <div class="container">
+                <div class="section-header text-center">
+                    <span class="section-kicker">Acreditación Gratuita</span>
+                    <h2 class="section-title">Ponte en Contacto y Reserva tu Entrada</h2>
+                    <p class="section-subtitle">
+                        Formulario integrado y listo para conectar con tu endpoint de <strong>Formspree</strong>.
+                    </p>
+                </div>
+
+                <div class="contact-card">
+                    <form id="contact-form" action="https://formspree.io/f/TU_ENDPOINT_AQUI" method="POST">
+                        <div class="form-group">
+                            <label for="nombre">Nombre Completo *</label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Ej. Jonathan Fuentes" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Correo Electrónico (Institucional o Personal) *</label>
+                            <input type="email" id="email" name="email" placeholder="usuario@uptc.edu.co" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rol">Ocupación / Perfil</label>
+                            <select id="rol" name="rol">
+                                <option value="Estudiante UPTC">Estudiante UPTC</option>
+                                <option value="Docente / Investigador">Docente / Investigador</option>
+                                <option value="Desarrollador Profesional">Desarrollador Profesional</option>
+                                <option value="Entusiasta de Tecnología">Entusiasta de Tecnología</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mensaje">Mensaje o Interés en el Evento</label>
+                            <textarea id="mensaje" name="mensaje" rows="3" placeholder="¿Qué temas te gustaría aprender en Java & AI Day?"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-primary btn-block">Confirmar Asistencia y Enviar Mensaje</button>
+                    </form>
+                    <div id="form-status" class="form-status-msg" style="display: none;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2026 Proyecto Unidad 3 UPTC. Todos los derechos reservados.</p>
+        <div class="container footer-content">
+            <p>&copy; 2026 Proyecto Unidad 3 UPTC — Java & AI Day Boyacá. Desarrollado por María Medina, Natalia Cruz y Jonathan Stick GB.</p>
+            <div class="footer-links">
+                <a href="#inicio">Inicio</a>
+                <a href="#ponentes">Ponentes</a>
+                <a href="#alianzas">Alianzas</a>
+                <a href="#equipo">Equipo UPTC</a>
+                <a href="#contacto">Contacto</a>
+            </div>
+        </div>
     </footer>
 
+    <!-- Script de Interactividad y Animaciones -->
     <script src="script.js"></script>
 </body>
 </html>
