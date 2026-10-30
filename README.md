@@ -7,63 +7,98 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
-
-Este proyecto es una **Landing Page profesional, interactiva y responsiva** desarrollada como evidencia práctica del flujo de trabajo profesional utilizando Git, GitHub, ramas de características (*Feature Branch Workflow*) y metodologías ágiles (Kanban) en la Escuela de Ingeniería de Sistemas y Computación de la **UPTC**.
+> *Repositorio:* jonathanStickgb/landing-page-proyecto_Unidad_3
+> *Rama principal:* main
+> *Institución:* Universidad Pedagógica y Tecnológica de Colombia (UPTC), Sede Central Tunja
+> *Escuela:* Escuela de Ingeniería de Sistemas y Computación
+> *Evento:* Java & AI Day Boyacá 2026
+> *Fechas:* 4 y 5 de diciembre de 2026
+> *Lugar:* Auditorio Paraninfo San Jerónimo, Tunja, Boyacá
 
 ---
 
 ## 🚀 Enlace del Sitio en Vivo (GitHub Pages)
-Visita el sitio desplegado en vivo aquí:  
+
 👉 **[https://jonathanstickgb.github.io/landing-page-proyecto_Unidad_3/](https://jonathanstickgb.github.io/landing-page-proyecto_Unidad_3/)**
 
 ---
 
 ## 👥 Equipo de Trabajo
-* **María Medina** ([@mariamedina-cmd](https://github.com/mariamedina-cmd)):  
-  *Arquitectura HTML semántica, Accesibilidad Web (WCAG) y optimización SEO / Open Graph.*
-* **Natalia Cruz** ([@nataliacruzmoreno](https://github.com/nataliacruzmoreno)):  
-  *Interactividad en JavaScript, API IntersectionObserver, animaciones Reveal-on-Scroll y estilos CSS.*
-* **Jonathan Stick Fuentes** ([@jonathanStickgb](https://github.com/jonathanStickgb)):  
-  *Documentación, configuración del repositorio, flujo de ramas Git Flow y despliegue en GitHub Pages.*
+
+| Desarrollador | Usuario GitHub | Rol principal |
+| :--- | :--- | :--- |
+| *María Medina* | [@mariamedina-cmd](https://github.com/mariamedina-cmd) | Arquitectura HTML, accesibilidad y SEO |
+| *Natalia Cruz* | [@nataliacruzmoreno](https://github.com/nataliacruzmoreno) | Interactividad JS, animaciones y estilos |
+| *Jonathan Stick* | [@jonathanStickgb](https://github.com/jonathanStickgb) | Repositorio, flujo de ramas y despliegue en GitHub Pages |
 
 ---
 
-## 🌟 Nuevas Características Implementadas
+## ✨ Características
 
-### 1. Fondo Temático Java & IA con Malla IDE
-* Reemplazo del fondo plano por una paleta de **gradientes profundos espresso** (`#0a0705` y `#120d0a`).
-* Acentos oficiales en **naranja Java (`#f89820`)** y **verde neón IA (`#00e676`)**.
-* Malla geométrica decorativa en CSS (`.bg-ide-grid`) inspirada en la grilla y números de línea de un editor/IDE de código.
-
-### 2. Animaciones al Scroll en Ponentes (IntersectionObserver)
-* Implementación de la API moderna `IntersectionObserver` en `script.js`.
-* Clases CSS `.reveal-card` y `.revealed` para activar un desplazamiento suave vertical (*fade-in + translate-up*) de manera individual y escalonada (`delay-1`, `delay-2`, `delay-3`).
-
-### 3. Sección "Organizan y Apoyan" (Tarjetas con Borde Punteado)
-* Réplica de tarjetas con **bordes punteados (`border: 2px dashed rgba(248, 152, 32, 0.35)`)** sobre fondo crema/dorado tenue adaptado al tema oscuro.
-* Alianzas con la **UPTC**, **Java Community Colombia (JUG)**, **Boyacá Devs** y la **Red Colombiana de Inteligencia Artificial (RedIA)**.
-
-### 4. Modo Oscuro / Claro y Formulario de Contacto
-* Toggle dinámico de tema con atributo `data-theme` y persistencia en `localStorage`.
-* Formulario de registro/contacto preparado para integración con endpoint de **Formspree**.
+1. *Tema oscuro Java & IA*
+   - Fondo café oscuro #0a0705 y #120d0a.
+   - Acentos naranja Java #f89820 y verde neón #00e676.
+   - Malla decorativa estilo IDE.
+2. *Animaciones *reveal-on-scroll**
+   - Las tarjetas de ponentes aparecen al hacer scroll con la API nativa IntersectionObserver, sin librerías externas.
+3. *Sección "Organizan y Apoyan"*
+   - Tarjetas con bordes dorados segmentados que destacan a los organizadores y aliados del evento.
+4. *Registro de participantes*
+   - Los datos se guardan en el navegador con localStorage.
+5. *Sin dependencias*
+   - Funciona abriendo index.html o con cualquier servidor estático.
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
-* **HTML5 Semántico**: Estructura accesible, metadatos y tarjetas sociales Open Graph.
-* **CSS3 Moderno**: Variables CSS (tokens de diseño), Flexbox, CSS Grid y animaciones de compositor.
-* **JavaScript (Vanilla ES6+)**: API `IntersectionObserver`, manipulación del DOM y eventos asíncronos.
-* **Git & GitHub**: Ramas de características (`feature/*`), Pull Requests y despliegue continuo con GitHub Pages.
+## 📂 Estructura del Proyecto
+
+text
+landing-page-proyecto_Unidad_3/
+├── index.html    # Documento HTML5 semántico
+├── styles.css    # Estilos, variables CSS y animaciones
+├── script.js     # Interactividad e IntersectionObserver
+├── README.md     # Documentación
+├── .gitignore    # Archivos excluidos de Git
+└── LICENSE       # Licencia MIT
+
 
 ---
 
-## 📋 Instrucciones de Ejecución Local
-1. Clonar el repositorio:
-   ```bash
-   git clone https://github.com/jonathanStickgb/landing-page-proyecto_Unidad_3.git
-   ```
-2. Entrar al directorio del proyecto:
-   ```bash
-   cd landing-page-proyecto_Unidad_3
-   ```
-3. Abrir `index.html` en el navegador o ejecutar con la extensión *Live Server* de Visual Studio Code.
+## 🛠️ Cómo Ejecutar el Proyecto
+
+Abre index.html en tu navegador. No requiere instalación.
+
+También puedes usar un servidor local:
+
+bash
+# Con Python 3
+python -m http.server 8080
+
+# Con npx
+npx serve .
+
+
+---
+
+## 🔀 Flujo de Trabajo (Feature Branch Workflow)
+
+1. Actualiza main y crea una rama:
+   bash
+   git checkout main
+   git pull origin main
+   git checkout -b feature/mi-cambio
+   
+2. Haz tus cambios y súbelos:
+   bash
+   git add .
+   git commit -m "feat: descripción del cambio"
+   git push origin feature/mi-cambio
+   
+3. Abre un *Pull Request* hacia main y haz el merge.
+4. GitHub Pages despliega el sitio automáticamente en 1 o 2 minutos.
+
+---
+
+## 📜 Licencia
+
+Proyecto con fines educativos bajo licencia MIT. © 2026 UPTC.
