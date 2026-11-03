@@ -1,5 +1,5 @@
 # Landing Page - Proyecto Unidad 3 (UPTC)
-## Java & AI Day Boyacá 2026
+### Java & AI Day Boyacá 2026
 
 ![GitHub Pages Status](https://img.shields.io/badge/GitHub%20Pages-Active-success?style=flat-square&logo=github)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
