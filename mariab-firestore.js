@@ -30,8 +30,10 @@ const firebaseConfig = {
 };
 
 const COLLECTION = "attendees";
-const MAIN_KEY = "MARIAB_ATTENDEES_STORE_2026";
-const SEED_IDS = new Set(["1", "2", "3", "4"]); // datos de ejemplo: no se suben
+const MAIN_KEY = "MARIAB_DB_ATTENDEES_2026"; // clave que usa script.js (si no existe, se detecta cualquier MARIAB_*)
+const SEED_IDS = new Set(["1", "2", "3", "4"]);
+const isSeed = (id) => SEED_IDS.has(String(id)) || String(id).startsWith("seed-"); // datos de ejemplo: no se suben
+const TRACKS = ["Ambos (Java + IA)", "Core Java & Loom", "IA Generativa & LangChain4j"];
 const STATUSES = ["confirmado", "pendiente", "checkin", "cancelado"];
 
 const app = initializeApp(firebaseConfig);
@@ -61,7 +63,7 @@ function toRemote(a) {
     role: a.role,
     organization: String(a.organization || "UPTC Tunja").slice(0, 120),
     attendanceType: a.attendanceType === "streaming" ? "streaming" : "presencial",
-    primaryTrack: a.primaryTrack || "Ambos (Java + IA)",
+    primaryTrack: TRACKS.includes(a.primaryTrack || a.track) ? (a.primaryTrack || a.track) : TRACKS[0],
     ticketNumber: String(a.ticketNumber || "").slice(0, 64),
     status: STATUSES.includes(a.status) ? a.status : "confirmado",
     updatedAt: serverTimestamp(),
@@ -95,7 +97,7 @@ function onLocalChange(list) {
   if (!Array.isArray(list)) return;
   const next = new Map();
   list.forEach((a) => {
-    if (a && a.id !== undefined && !SEED_IDS.has(String(a.id))) next.set(String(a.id), a);
+    if (a && a.id !== undefined && !isSeed(a.id)) next.set(String(a.id), a);
   });
   for (const [id, a] of next) {
     const json = JSON.stringify(a);
@@ -121,7 +123,7 @@ async function syncAll() {
 
   // 1) subir lo local
   await Promise.allSettled(
-    list.filter((a) => !SEED_IDS.has(String(a.id))).map(upsert)
+    list.filter((a) => !isSeed(a.id)).map(upsert)
   );
   // 2) traer todo lo de Firestore
   const snap = await getDocs(collection(db, COLLECTION));
@@ -137,6 +139,7 @@ async function syncAll() {
       organization: r.organization,
       attendanceType: r.attendanceType,
       status: r.status,
+      track: r.primaryTrack,
     });
   });
   const result = [...merged.values()];

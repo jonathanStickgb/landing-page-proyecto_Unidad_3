@@ -5,6 +5,7 @@ Archivos de este paquete (van en la **raíz** del repositorio):
 | Archivo | Para qué sirve |
 |---|---|
 | `mariab-firestore.js` | Replica cada registro de la landing en Firestore y da el botón "☁ Admin Firebase" |
+| `index.html` | Tu index actual + una línea: `<script type="module" src="mariab-firestore.js">` |
 | `firestore.rules` | Reglas de seguridad (copia para documentar; se publican en la consola de Firebase) |
 
 ## Paso 1 · Publicar las reglas
@@ -17,12 +18,10 @@ Archivos de este paquete (van en la **raíz** del repositorio):
 1. **Authentication** → *Sign-in method* → habilita **Google**.
 2. **Authentication → Settings → Authorized domains** → agrega `jonathanstickgb.github.io`.
 
-## Paso 3 · Subir a GitHub y enlazar
-1. Sube `mariab-firestore.js` y `firestore.rules` a la raíz de `main`.
-2. En `index.html`, justo antes de `</body>`, agrega:
-   ```html
-   <script type="module" src="./mariab-firestore.js"></script>
-   ```
+## Paso 3 · Subir a GitHub (raíz de `main`)
+Sube **solo estos 3 archivos**: `index.html` (ya trae la línea que carga el módulo), `mariab-firestore.js` y `firestore.rules`.
+
+⚠️ **No subas** el `script.js` ni el `styles.css` del zip anterior (`archivos_faltantes_github.zip`): son versiones viejas y borrarían el login de administrador que ya tienes publicado.
 
 ## Paso 4 · Probar
 1. Abre la landing en ventana de incógnito, registra un asistente y pulsa *Guardar en MARIAB*.
