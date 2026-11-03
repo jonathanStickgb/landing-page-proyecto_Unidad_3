@@ -20,15 +20,12 @@ import {
 import {
   getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import { firebaseConfig } from "./firebase-config.js";
 
-const firebaseConfig = {
-  projectId: "gen-lang-client-0670177882",
-  appId: "1:321736566620:web:0b4e8c2469958896754399",
-  apiKey: "AIzaSyAIaxhHyu08XJsrsG9nJ5h_K4eevyzTCe0",
-  authDomain: "gen-lang-client-0670177882.firebaseapp.com",
-  firestoreDatabaseId: "ai-studio-javaaidayboyac20-f45643e8-ac0a-4348-830d-e9486039d09b",
-};
 
+const configIncompleta = /PEGAR/.test(String(firebaseConfig.apiKey) + String(firebaseConfig.appId));
+
+function main() {
 const COLLECTION = "attendees";
 const MAIN_KEY = "MARIAB_DB_ATTENDEES_2026"; // clave que usa script.js (si no existe, se detecta cualquier MARIAB_*)
 const SEED_IDS = new Set(["1", "2", "3", "4"]);
@@ -37,7 +34,7 @@ const TRACKS = ["Ambos (Java + IA)", "Core Java & Loom", "IA Generativa & LangCh
 const STATUSES = ["confirmado", "pendiente", "checkin", "cancelado"];
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+const db = getFirestore(app); // base "(default)" del proyecto
 const auth = getAuth(app);
 
 const origSetItem = Storage.prototype.setItem;
@@ -183,3 +180,10 @@ function buildUI() {
 }
 
 buildUI();
+}
+
+if (configIncompleta) {
+  console.warn("[MARIAB→Firestore] Falta completar firebase-config.js (apiKey y appId).");
+} else {
+  main();
+}

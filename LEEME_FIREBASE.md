@@ -9,18 +9,21 @@ Archivos de este paquete (van en la **raíz** del repositorio):
 | `script.js` | Tu script con `handleAdminButton`, `handleAdminLogin`, `handleEditSubmit` y el botón Editar (el index ya los llamaba pero no existían) |
 | `firestore.rules` | Reglas de seguridad (copia para documentar; se publican en la consola de Firebase) |
 
-## Paso 1 · Publicar las reglas
-1. https://console.firebase.google.com → proyecto **gen-lang-client-0670177882**.
-2. **Firestore Database** → selecciona la base `ai-studio-javaaidayboyac20-f45643e8-…` → pestaña **Reglas**.
-3. Borra lo que haya, pega el contenido de `firestore.rules` y pulsa **Publicar**.
-4. En `firestore.rules`, función `isAdmin()`, deja solo los correos (cuentas Google) de los administradores.
+# Paso 1 · Crear la base y publicar las reglas
+1. https://console.firebase.google.com → proyecto **gen-lang-client-0670177882** → **Firestore** → **Crear base de datos**.
+2. Edición **Standard**, ID de base `(default)`, ubicación `southamerica-east1` (São Paulo) o la más cercana (no se puede cambiar después).
+3. Modo **producción** → Crear.
+4. Pestaña **Reglas**: borra todo, pega el contenido de `firestore.rules` y pulsa **Publicar**.
+5. En `firestore.rules`, función `isAdmin()`, deja solo los correos (cuentas Google) de los administradores.
 
 ## Paso 2 · Activar el inicio de sesión con Google
 1. **Authentication** → *Sign-in method* → habilita **Google**.
 2. **Authentication → Settings → Authorized domains** → agrega `jonathanstickgb.github.io`.
 
 ## Paso 3 · Subir a GitHub (raíz de `main`)
-Sube estos 4 archivos: `index.html`, `script.js` (nuevo, con modo administrador), `mariab-firestore.js` y `firestore.rules`.
+Sube estos archivos: `index.html`, `script.js` (con modo administrador), `mariab-firestore.js`, `firebase-config.js` y `firestore.rules`.
+
+`firebase-config.js` ya trae los datos de la app web `landing-javaai`. Si el login da `auth/api-key-not-valid`, compara la `apiKey` carácter por carácter con la de Firebase (cuidado con l/I y 0/O).
 
 ⚠️ **No subas** el `script.js` ni el `styles.css` del zip `archivos_faltantes_github.zip`: son versiones viejas.
 
