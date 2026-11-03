@@ -8,7 +8,7 @@
 --
 -- Opción A: Vía psql con PostgreSQL local instalado:
 --   psql -U postgres -c "CREATE DATABASE \"MARIAB\";"
---   psql -U postgres -d MARIAB -f schema_MARIAB.sql
+---   psql -U postgres -d MARIAB -f schema_MARIAB.sql
 --
 -- Opción B: Vía Docker (un solo comando):
 --   docker run --name postgres-mariab -e POSTGRES_DB=MARIAB -e POSTGRES_USER=mariab_admin -e POSTGRES_PASSWORD=mariab_tech_2026 -p 5432:5432 -d postgres:16-alpine
