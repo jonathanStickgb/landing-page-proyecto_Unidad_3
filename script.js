@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 3. Inicializar Base de Datos MARIAB en LocalStorage
   initMariaBStorage();
-  refreshAdminUI();
 
   // 4. Atajo de teclado para cerrar modales con la tecla Escape
   document.addEventListener('keydown', (e) => {
@@ -92,20 +91,6 @@ function initCountdown() {
  */
 const MARIAB_STORAGE_KEY = 'MARIAB_DB_ATTENDEES_2026';
 let mariaBAttendees = [];
-
-/**
- * Modo Administrador (clave verificada por hash SHA-256 en el navegador).
- * Aviso: es una barrera de interfaz; la seguridad real de los datos en la
- * nube la dan las reglas de Firestore (firestore.rules).
- * Para cambiar la clave, en la consola del navegador (F12) ejecuta:
- *   hashAdminPassword('NuevaClave').then(console.log)
- * y pega el resultado en ADMIN_PASSWORD_HASH.
- */
-const ADMIN_SALT = 'MARIAB-2026:';
-const ADMIN_PASSWORD_HASH = 'e89658b4036423535939c25cf919ba62b27d0954041abfb128a09b5ffda86b4d';
-const ADMIN_SESSION_KEY = 'MARIAB_ADMIN_SESSION';
-let isAdmin = false;
-try { isAdmin = sessionStorage.getItem(ADMIN_SESSION_KEY) === '1'; } catch (e) { isAdmin = false; }
 
 const INITIAL_MARIAB_SEEDS = [
   {
@@ -200,7 +185,7 @@ function renderMariaBTable(data) {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-white/[0.03] transition-colors border-b border-white/5';
     tr.innerHTML = `
-      <td class="py-3 px-4 font-mono font-bold text-[#f89820] text-xs">${escapeHtml(item.ticketNumber)}</td>
+      <td class="py-3 px-4 font-mono font-bold text-[#f89820] text-xs">${item.ticketNumber}</td>
       <td class="py-3 px-4">
         <div class="font-bold text-[#fbf7f2] text-xs">${escapeHtml(item.fullName)}</div>
         <div class="text-[11px] text-[#a8998a] font-mono">${escapeHtml(item.email)}</div>
@@ -224,15 +209,12 @@ function renderMariaBTable(data) {
         </span>
       </td>
       <td class="py-3 px-4 text-right text-xs">
-        ${
-          isAdmin
-            ? `<button onclick="openEditModal('${item.id}')" class="px-2 py-1 text-[11px] font-mono text-[#f89820] hover:underline">Editar</button>
-        <button onclick="toggleCheckin('${item.id}')" class="px-2 py-1 text-[11px] font-mono text-[#00e676] hover:underline ml-1">
+        <button onclick="toggleCheckin('${item.id}')" class="px-2 py-1 text-[11px] font-mono text-[#00e676] hover:underline">
           ${item.status === 'checkin' ? 'Check-out' : 'Check-in'}
         </button>
-        <button onclick="deleteAttendee('${item.id}')" class="px-2 py-1 text-[11px] font-mono text-red-400 hover:underline ml-1">Eliminar</button>`
-            : `<span class="text-[11px] font-mono text-[#6f6256]" title="Inicia sesión como administrador">🔒</span>`
-        }
+        <button onclick="deleteAttendee('${item.id}')" class="px-2 py-1 text-[11px] font-mono text-red-400 hover:underline ml-2">
+          Eliminar
+        </button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -252,7 +234,6 @@ function filterAttendees() {
 }
 
 function toggleCheckin(id) {
-  if (!requireAdmin()) return;
   const item = mariaBAttendees.find((a) => a.id === id);
   if (item) {
     item.status = item.status === 'checkin' ? 'confirmado' : 'checkin';
@@ -262,7 +243,6 @@ function toggleCheckin(id) {
 }
 
 function deleteAttendee(id) {
-  if (!requireAdmin()) return;
   if (confirm('¿Eliminar esta acreditación de la base de datos MARIAB?')) {
     mariaBAttendees = mariaBAttendees.filter((a) => a.id !== id);
     saveMariaBStorage();
@@ -316,9 +296,8 @@ function closeModal(id) {
 }
 
 function closeAllModals() {
-  ['registerModal', 'adminLoginModal', 'editModal'].forEach((id) => {
-    const m = document.getElementById(id);
-    if (m) m.classList.add('hidden');
+  document.querySelectorAll('.fixed[role="dialog"], #registerModal').forEach((m) => {
+    m.classList.add('hidden');
   });
 }
 
@@ -329,122 +308,4 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
-}
-
-/**
- * =====================================================================
- * MODO ADMINISTRADOR + EDICIÓN DE REGISTROS
- * =====================================================================
- */
-async function hashAdminPassword(password) {
-  if (!window.crypto || !window.crypto.subtle) {
-    throw new Error('Este navegador no permite verificar la clave (se requiere HTTPS).');
-  }
-  const data = new TextEncoder().encode(ADMIN_SALT + password);
-  const buf = await window.crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
-}
-
-function requireAdmin() {
-  if (isAdmin) return true;
-  alert('Solo el administrador puede realizar esta acción.\nUsa el botón "Acceso Administrador".');
-  openModal('adminLoginModal');
-  return false;
-}
-
-function refreshAdminUI() {
-  const badge = document.getElementById('adminBadge');
-  const btn = document.getElementById('adminToggleBtn');
-  if (badge) badge.classList.toggle('hidden', !isAdmin);
-  if (btn) btn.textContent = isAdmin ? '🔓 Cerrar sesión admin' : '🔒 Acceso Administrador';
-  renderMariaBTable(mariaBAttendees);
-  filterAttendees();
-}
-
-function handleAdminButton() {
-  if (isAdmin) {
-    isAdmin = false;
-    try { sessionStorage.removeItem(ADMIN_SESSION_KEY); } catch (e) { /* sin sessionStorage */ }
-    refreshAdminUI();
-    return;
-  }
-  const err = document.getElementById('adminLoginError');
-  if (err) err.classList.add('hidden');
-  openModal('adminLoginModal');
-  setTimeout(() => document.getElementById('adminPassword')?.focus(), 50);
-}
-
-async function handleAdminLogin(event) {
-  event.preventDefault();
-  const input = document.getElementById('adminPassword');
-  const err = document.getElementById('adminLoginError');
-  const showError = (msg) => {
-    if (!err) return;
-    err.textContent = msg;
-    err.classList.remove('hidden');
-  };
-
-  try {
-    const hash = await hashAdminPassword(input?.value || '');
-    if (hash !== ADMIN_PASSWORD_HASH) {
-      showError('Contraseña incorrecta.');
-      return;
-    }
-  } catch (e) {
-    showError(e.message);
-    return;
-  }
-
-  isAdmin = true;
-  try { sessionStorage.setItem(ADMIN_SESSION_KEY, '1'); } catch (e) { /* sin sessionStorage */ }
-  if (input) input.value = '';
-  if (err) err.classList.add('hidden');
-  closeModal('adminLoginModal');
-  refreshAdminUI();
-}
-
-function openEditModal(id) {
-  if (!requireAdmin()) return;
-  const item = mariaBAttendees.find((a) => a.id === id);
-  if (!item) return;
-  const set = (elId, value) => {
-    const el = document.getElementById(elId);
-    if (el) el.value = value;
-  };
-  set('editId', item.id);
-  set('editName', item.fullName);
-  set('editEmail', item.email);
-  set('editRole', item.role);
-  set('editAttendance', item.attendanceType);
-  set('editOrg', item.organization);
-  set('editStatus', item.status);
-  const label = document.getElementById('editTicketLabel');
-  if (label) label.textContent = item.ticketNumber;
-  openModal('editModal');
-}
-
-function handleEditSubmit(event) {
-  event.preventDefault();
-  if (!requireAdmin()) return;
-  const id = document.getElementById('editId')?.value;
-  const item = mariaBAttendees.find((a) => a.id === id);
-  if (!item) return;
-
-  const name = document.getElementById('editName')?.value.trim();
-  const email = document.getElementById('editEmail')?.value.trim();
-  if (!name || !email) {
-    alert('Nombre y correo son obligatorios.');
-    return;
-  }
-  item.fullName = name;
-  item.email = email;
-  item.role = document.getElementById('editRole')?.value;
-  item.attendanceType = document.getElementById('editAttendance')?.value;
-  item.organization = document.getElementById('editOrg')?.value.trim() || 'UPTC Tunja';
-  item.status = document.getElementById('editStatus')?.value;
-
-  saveMariaBStorage();
-  filterAttendees();
-  closeModal('editModal');
-  alert('Registro actualizado en la base de datos MARIAB.');
 }
