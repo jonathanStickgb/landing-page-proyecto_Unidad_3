@@ -6,6 +6,7 @@ Archivos de este paquete (van en la **raíz** del repositorio):
 |---|---|
 | `mariab-firestore.js` | Replica cada registro de la landing en Firestore y da el botón "☁ Admin Firebase" |
 | `index.html` | Tu index actual + una línea: `<script type="module" src="mariab-firestore.js">` |
+| `script.js` | Tu script con `handleAdminButton`, `handleAdminLogin`, `handleEditSubmit` y el botón Editar (el index ya los llamaba pero no existían) |
 | `firestore.rules` | Reglas de seguridad (copia para documentar; se publican en la consola de Firebase) |
 
 ## Paso 1 · Publicar las reglas
@@ -19,9 +20,11 @@ Archivos de este paquete (van en la **raíz** del repositorio):
 2. **Authentication → Settings → Authorized domains** → agrega `jonathanstickgb.github.io`.
 
 ## Paso 3 · Subir a GitHub (raíz de `main`)
-Sube **solo estos 3 archivos**: `index.html` (ya trae la línea que carga el módulo), `mariab-firestore.js` y `firestore.rules`.
+Sube estos 4 archivos: `index.html`, `script.js` (nuevo, con modo administrador), `mariab-firestore.js` y `firestore.rules`.
 
-⚠️ **No subas** el `script.js` ni el `styles.css` del zip anterior (`archivos_faltantes_github.zip`): son versiones viejas y borrarían el login de administrador que ya tienes publicado.
+⚠️ **No subas** el `script.js` ni el `styles.css` del zip `archivos_faltantes_github.zip`: son versiones viejas.
+
+**Clave del modo administrador:** el `script.js` guarda solo el hash SHA-256 de la clave. Para cambiarla, abre la landing, pulsa `F12` → Console y ejecuta `hashAdminPassword('NuevaClave').then(console.log)`; pega el resultado en `ADMIN_PASSWORD_HASH`.
 
 ## Paso 4 · Probar
 1. Abre la landing en ventana de incógnito, registra un asistente y pulsa *Guardar en MARIAB*.
