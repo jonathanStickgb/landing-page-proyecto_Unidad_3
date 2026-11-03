@@ -1,0 +1,62 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Por defecto todo denegado
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ⚠️ EDITAR: correos (cuentas Google) con permiso de administrador
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in [
+          'stick199514@hotmail.com',
+          'maria.medina@uptc.edu.co'
+        ];
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128
+        && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidAttendee(d) {
+      return d.keys().hasAll([
+          'fullName', 'email', 'role', 'organization',
+          'attendanceType', 'primaryTrack', 'ticketNumber', 'status'
+        ])
+        && d.keys().hasOnly([
+          'fullName', 'email', 'role', 'organization',
+          'attendanceType', 'primaryTrack', 'ticketNumber', 'status', 'updatedAt'
+        ])
+        && d.fullName is string && d.fullName.size() >= 3 && d.fullName.size() <= 100
+        && d.email is string && d.email.size() >= 5 && d.email.size() <= 120
+        && d.role in [
+          'Estudiante UPTC', 'Estudiante Otra Universidad',
+          'Desarrollador / Ingeniero', 'Docente / Investigador',
+          'Líder Tech / Empresa'
+        ]
+        && d.organization is string && d.organization.size() <= 120
+        && d.attendanceType in ['presencial', 'streaming']
+        && d.primaryTrack in [
+          'Ambos (Java + IA)', 'Core Java & Loom', 'IA Generativa & LangChain4j'
+        ]
+        && d.ticketNumber is string && d.ticketNumber.size() <= 64
+        && d.status in ['confirmado', 'pendiente', 'checkin', 'cancelado']
+        && (!('updatedAt' in d) || d.updatedAt == request.time);
+    }
+
+    match /attendees/{attendeeId} {
+      // Cualquier visitante puede registrarse (crear), pero NO leer la lista
+      allow create: if isValidId(attendeeId) && isValidAttendee(request.resource.data);
+
+      // Solo el administrador lee, edita y elimina
+      allow get, list: if isAdmin();
+      allow update: if isAdmin() && isValidAttendee(request.resource.data);
+      allow delete: if isAdmin();
+    }
+  }
+}
