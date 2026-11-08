@@ -13,10 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2. Contador Regresivo para el 4 de Diciembre de 2026
   initCountdown();
 
-  // 3. Inicializar Base de Datos MARIAB en LocalStorage
+  // 3. Restaurar la sesión de administrador (antes de pintar la tabla)
+  initAdminSession();
+
+  // 4. Inicializar Base de Datos MARIAB en LocalStorage
   initMariaBStorage();
 
-  // 4. Atajo de teclado para cerrar modales con la tecla Escape
+  // 5. Atajo de teclado para cerrar modales con la tecla Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeAllModals();
@@ -212,9 +215,16 @@ function renderMariaBTable(data) {
         <button onclick="toggleCheckin('${item.id}')" class="px-2 py-1 text-[11px] font-mono text-[#00e676] hover:underline">
           ${item.status === 'checkin' ? 'Check-out' : 'Check-in'}
         </button>
-        <button onclick="deleteAttendee('${item.id}')" class="px-2 py-1 text-[11px] font-mono text-red-400 hover:underline ml-2">
-          Eliminar
-        </button>
+        ${
+          isAdmin
+            ? `<button onclick="openEditModal('${item.id}')" class="px-2 py-1 text-[11px] font-mono text-[#f89820] hover:underline ml-2">
+                 Editar
+               </button>
+               <button onclick="deleteAttendee('${item.id}')" class="px-2 py-1 text-[11px] font-mono text-red-400 hover:underline ml-2">
+                 Eliminar
+               </button>`
+            : ''
+        }
       </td>
     `;
     tbody.appendChild(tr);
@@ -243,6 +253,7 @@ function toggleCheckin(id) {
 }
 
 function deleteAttendee(id) {
+  if (!isAdmin) return;
   if (confirm('¿Eliminar esta acreditación de la base de datos MARIAB?')) {
     mariaBAttendees = mariaBAttendees.filter((a) => a.id !== id);
     saveMariaBStorage();
@@ -296,9 +307,148 @@ function closeModal(id) {
 }
 
 function closeAllModals() {
-  document.querySelectorAll('.fixed[role="dialog"], #registerModal').forEach((m) => {
-    m.classList.add('hidden');
-  });
+  ['registerModal', 'adminLoginModal', 'editModal'].forEach(closeModal);
+}
+
+/**
+ * =====================================================================
+ * MODO ADMINISTRADOR (editar y eliminar registros)
+ * ---------------------------------------------------------------------
+ * Nota: es un sitio estático en GitHub Pages, así que este acceso es
+ * una protección de interfaz para la demo, no una seguridad real.
+ * La contraseña no se guarda en texto plano: se compara su hash SHA-256.
+ * Para cambiarla, ejecuta en la consola del navegador:
+ *   await sha256('tu-nueva-clave')
+ * y pega el resultado en ADMIN_PASSWORD_HASH.
+ * =====================================================================
+ */
+const ADMIN_PASSWORD_HASH = '4348565feaa25a1eacb3bd5b004362d7b5245caa0f29d54b2f88575a1d68f166';
+const ADMIN_SESSION_KEY = 'MARIAB_ADMIN_SESSION';
+let isAdmin = false;
+
+async function sha256(text) {
+  const data = new TextEncoder().encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+function initAdminSession() {
+  try {
+    isAdmin = sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true';
+  } catch (e) {
+    isAdmin = false;
+  }
+  updateAdminUI();
+}
+
+function setAdminMode(active) {
+  isAdmin = active;
+  try {
+    if (active) {
+      sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
+    } else {
+      sessionStorage.removeItem(ADMIN_SESSION_KEY);
+    }
+  } catch (e) {
+    // Si el navegador bloquea sessionStorage, el modo dura hasta recargar.
+  }
+  updateAdminUI();
+  filterAttendees();
+}
+
+function updateAdminUI() {
+  const badge = document.getElementById('adminBadge');
+  const btn = document.getElementById('adminToggleBtn');
+  if (badge) badge.classList.toggle('hidden', !isAdmin);
+  if (btn) btn.textContent = isAdmin ? '🔓 Cerrar sesión' : '🔒 Acceso Administrador';
+}
+
+function handleAdminButton() {
+  if (isAdmin) {
+    if (confirm('¿Cerrar la sesión de administrador?')) {
+      setAdminMode(false);
+    }
+    return;
+  }
+
+  const input = document.getElementById('adminPassword');
+  const error = document.getElementById('adminLoginError');
+  if (input) input.value = '';
+  if (error) error.classList.add('hidden');
+  openModal('adminLoginModal');
+  input?.focus();
+}
+
+async function handleAdminLogin(event) {
+  event.preventDefault();
+  const input = document.getElementById('adminPassword');
+  const error = document.getElementById('adminLoginError');
+  const showError = (msg) => {
+    if (error) {
+      error.textContent = msg;
+      error.classList.remove('hidden');
+    }
+  };
+
+  if (!window.crypto?.subtle) {
+    showError('Tu navegador no permite verificar la contraseña en este contexto.');
+    return;
+  }
+
+  const hash = await sha256(input?.value || '');
+  if (hash === ADMIN_PASSWORD_HASH) {
+    setAdminMode(true);
+    closeModal('adminLoginModal');
+    if (input) input.value = '';
+  } else {
+    showError('Contraseña incorrecta. Inténtalo de nuevo.');
+    input?.select();
+  }
+}
+
+function openEditModal(id) {
+  if (!isAdmin) return;
+  const item = mariaBAttendees.find((a) => a.id === id);
+  if (!item) return;
+
+  document.getElementById('editId').value = item.id;
+  document.getElementById('editTicketLabel').textContent = item.ticketNumber;
+  document.getElementById('editName').value = item.fullName;
+  document.getElementById('editEmail').value = item.email;
+  document.getElementById('editRole').value = item.role;
+  document.getElementById('editAttendance').value = item.attendanceType;
+  document.getElementById('editOrg').value = item.organization;
+  document.getElementById('editStatus').value = item.status;
+  openModal('editModal');
+}
+
+function handleEditSubmit(event) {
+  event.preventDefault();
+  if (!isAdmin) return;
+
+  const id = document.getElementById('editId').value;
+  const item = mariaBAttendees.find((a) => a.id === id);
+  if (!item) return;
+
+  const name = document.getElementById('editName').value.trim();
+  const email = document.getElementById('editEmail').value.trim();
+  if (!name || !email) {
+    alert('Por favor completa todos los campos requeridos.');
+    return;
+  }
+
+  item.fullName = name;
+  item.email = email;
+  item.role = document.getElementById('editRole').value;
+  item.attendanceType = document.getElementById('editAttendance').value;
+  item.organization = document.getElementById('editOrg').value.trim() || 'UPTC Tunja';
+  item.status = document.getElementById('editStatus').value;
+
+  saveMariaBStorage();
+  filterAttendees();
+  closeModal('editModal');
 }
 
 function escapeHtml(str) {
