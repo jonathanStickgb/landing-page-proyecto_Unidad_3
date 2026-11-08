@@ -9,7 +9,8 @@ set -e
 
 DB_NAME="MARIAB"
 DB_USER="mariab_admin"
-DB_PASS="mariab_tech_2026"
+# Define DB_PASS antes de ejecutar: export DB_PASS="tu_clave_segura"
+DB_PASS="${DB_PASS:-cambia_esta_clave}"
 DB_PORT="5432"
 CONTAINER_NAME="postgres-mariab"
 SQL_FILE="schema_MARIAB.sql"
