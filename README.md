@@ -56,7 +56,7 @@
 | **HTML5** | Estructura semántica (`header`, `main`, `section`, `footer`), metadatos SEO y Open Graph, formularios accesibles. |
 | **CSS3** | Variables CSS (*design tokens*) en `:root`, Flexbox, CSS Grid, animaciones y transiciones. |
 | **Tailwind CSS (CDN)** | Clases utilitarias para maquetación rápida y responsive. |
-| **JavaScript ES6+** | `IntersectionObserver`, cuenta regresiva, manipulación del DOM, módulo de registros con `localStorage`, funciones flecha y *template literals*. |
+| **JavaScript ES6+** | `IntersectionObserver`, cuenta regresiva, manipulación del DOM, módulo de registros con `localStorage`, funciones flecha y *template literals*. Código organizado en módulos IIFE con namespace (`LPModal`, `LPUi`, `LPForm`, `LPAdmin`), sin variables globales ni manejadores `onclick` en el HTML. |
 | **Google AI Studio** | Asistente de IA para generar el prototipo inicial del diseño, proponer la estructura de secciones y apoyar la redacción del contenido; el código resultante fue revisado y adaptado por el equipo. |
 | **Git & GitHub** | Control de versiones, ramas `feature/*` y `fix/*`, Pull Requests, Issues y GitHub Projects (Kanban). |
 | **GitHub Pages** | Despliegue público y continuo desde la rama `main`. |
