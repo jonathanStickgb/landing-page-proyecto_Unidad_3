@@ -36,13 +36,15 @@
 ## ✨ Características
 
 - **Hero con cuenta regresiva** en tiempo real hasta el inicio del evento (4 y 5 de diciembre de 2026).
-- **Sección de ponentes** con animación *reveal-on-scroll* implementada con la API `IntersectionObserver`, con retrasos escalonados (`delay-1`, `delay-2`, `delay-3`).
+- **Sección de ponentes** con animación *reveal-on-scroll* implementada con la API `IntersectionObserver`, con retrasos escalonados (retrasos calculados en JavaScript).
 - **Agenda** del evento organizada por jornadas.
-- **Sección "Organizan y Apoyan"** con tarjetas de borde punteado: UPTC, Java Community Colombia (JUG), Boyacá Devs y RedIA.
+- **Sección "Organizan y Apoyan"** con tarjetas de borde punteado: UPTC, Boyacá Devs y Java User Group Colombia.
 - **Equipo UPTC** responsable del proyecto.
-- **Registro de acreditación gratuita** mediante formulario modal con validación de campos.
+- **Propuesta de valor y testimonios** con tres beneficios, características de la acreditación y comentarios de la comunidad.
+- **Registro de acreditación gratuita** mediante formulario modal con validación, **autoguardado en `localStorage`** (claves `lp_jai2026_*`), restauración al recargar, **envío real por POST a Formspree**, limpieza del borrador tras enviar y mensaje de agradecimiento para el usuario ya convertido.
+- **Aviso legal** de tratamiento de datos (Ley 1581 de 2012) y pie de página con contacto.
 - **Panel de gestión de acreditaciones** (búsqueda, check-in, edición y eliminación de registros) con persistencia local en `localStorage`.
-- **Tema visual Java & IA:** fondo espresso (`#0a0705`), acentos naranja Java (`#f89820`) y verde IA (`#00e676`), y una malla decorativa inspirada en un IDE (`.bg-ide-grid`).
+- **Tema visual Java & IA:** fondo espresso (`#0a0705`), acentos naranja Java (`#f89820`) y verde IA (`#00e676`), y una malla decorativa inspirada en un IDE (`.bg-code-grid`).
 - **Diseño responsive** para móvil, tablet y escritorio.
 
 ---
@@ -95,7 +97,7 @@ landing-page-proyecto_Unidad_3/
 ├── script.js           # Interactividad: animaciones, cuenta regresiva y registros
 ├── images/             # Imágenes del hero y de los ponentes
 ├── docs/               # Recursos de documentación (captura del README)
-├── schema_MARIAB*.sql  # Esquema de base de datos de referencia (no se ejecuta en GitHub Pages)
+├── docs/db/            # Esquemas SQL y script de referencia (no se ejecutan en GitHub Pages)
 ├── LICENSE
 └── README.md
 ```
@@ -138,7 +140,8 @@ Puedes reutilizar esta landing para otro evento cambiando estos puntos:
 4. **Imágenes:** reemplaza los archivos de `images/` conservando el mismo nombre, o actualiza la ruta en el atributo `src`. Usa rutas relativas (`images/foto.jpg`) y respeta mayúsculas y minúsculas para que funcionen en GitHub Pages.
 5. **Tipografías:** cambia la URL de Google Fonts en el `<head>` de `index.html` y los nombres de fuente en `tailwind.config`.
 6. **Metadatos y SEO:** actualiza `<title>`, `meta description` y las etiquetas Open Graph (`og:*`) para que el enlace se vea bien al compartirlo.
-7. **Publicar tu versión:** haz un *fork*, ve a **Settings → Pages → Deploy from a branch → `main` / `root`** y espera un par de minutos.
+7. **Formulario:** crea un formulario en [Formspree](https://formspree.io) y pega su URL en `FORMSPREE_ENDPOINT` dentro de `script.js` (módulo `LPForm`).
+8. **Publicar tu versión:** haz un *fork*, ve a **Settings → Pages → Deploy from a branch → `main` / `root`** y espera un par de minutos.
 
 ---
 
