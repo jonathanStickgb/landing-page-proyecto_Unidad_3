@@ -10,7 +10,7 @@ set -e
 DB_NAME="MARIAB"
 DB_USER="mariab_admin"
 # Define DB_PASS antes de ejecutar: export DB_PASS="tu_clave_segura"
-DB_PASS="${DB_PASS:-cambia_esta_clave}"
+DB_PASS="${DB_PASS:?Define DB_PASS antes de ejecutar: export DB_PASS=tu_clave_segura}"
 DB_PORT="5432"
 CONTAINER_NAME="postgres-mariab"
 SQL_FILE="schema_MARIAB.sql"
@@ -45,7 +45,7 @@ if command -v docker >/dev/null 2>&1; then
     echo ""
     echo "¡Base de datos ${DB_NAME} generada con éxito!"
     echo "URL de Conexión JDBC: jdbc:postgresql://localhost:5432/${DB_NAME}"
-    echo "Usuario: ${DB_USER}  |  Contraseña: ${DB_PASS}"
+    echo "Usuario: ${DB_USER}"
 elif command -v psql >/dev/null 2>&1; then
     echo "[1/2] psql detectado en el sistema anfitrión. Creando base de datos ${DB_NAME}..."
     psql -U postgres -c "CREATE DATABASE \"${DB_NAME}\";" || echo "La base de datos ya existía."
