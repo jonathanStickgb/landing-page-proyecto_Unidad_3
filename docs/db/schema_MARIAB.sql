@@ -50,7 +50,7 @@ CREATE TABLE attendees (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Índices
-CREATE INDEX idx_attendees_email ON attendees(email);
+CREATE UNIQUE INDEX uq_attendees_email ON attendees(email); -- evita registros duplicados (la API responde 409)
 CREATE INDEX idx_attendees_status ON attendees(status);
 CREATE INDEX idx_attendees_created_at ON attendees(created_at);
 
