@@ -133,6 +133,9 @@ const LPForm = (() => {
 
   // Reemplaza por tu endpoint: https://formspree.io/f/xxxxxxxx (formspree.io → New Form)
   const FORMSPREE_ENDPOINT = 'https://formspree.io/f/REEMPLAZAR_CON_TU_ID';
+  // URL pública (HTTPS) de la API MARIAB, sin barra final. Vacío = no se usa la API.
+  // Ejemplo: 'https://mariab-api.onrender.com'
+  const API_URL = '';
   const NS = 'lp_jai2026_';
   const CONVERTED_KEY = NS + 'convertido';
   // id del campo en el HTML -> sufijo de la clave de almacenamiento
@@ -198,19 +201,42 @@ const LPForm = (() => {
     return true;
   }
 
-  // Envío POST (JSON) a Formspree; lanza un Error si la respuesta no es exitosa
+  // Envío de datos: API MARIAB (base de datos) y/o Formspree (correo). Devuelve el ticket si lo da la API.
   async function send(payload) {
-    if (FORMSPREE_ENDPOINT.includes('REEMPLAZAR')) {
-      throw new Error('El envío aún no está configurado: falta el endpoint de Formspree en script.js.');
+    const formspreeOn = !FORMSPREE_ENDPOINT.includes('REEMPLAZAR');
+    if (!API_URL && !formspreeOn) {
+      throw new Error('El envío aún no está configurado: define API_URL o el endpoint de Formspree en script.js.');
     }
     setStatus('Enviando…', false);
-    const res = await fetch(FORMSPREE_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error('No pudimos enviar tu registro. Tus datos siguen guardados; inténtalo de nuevo.');
+    let ticket = null;
+
+    if (API_URL) {
+      let res;
+      try {
+        res = await fetch(`${API_URL}/api/attendees`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...payload, consentimiento: $('formConsent')?.checked === true, _gotcha: $('formHoneypot')?.value || '' })
+        });
+      } catch (e) {
+        throw new Error('No pudimos contactar el servidor. Tus datos siguen guardados; inténtalo de nuevo.');
+      }
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'No pudimos registrar tus datos. Inténtalo de nuevo.');
+      ticket = data.ticket || null;
+    }
+
+    if (formspreeOn) {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ ...payload, ticket })
+      });
+      // Si la API ya guardó el registro, un fallo del correo no debe bloquear al usuario
+      if (!res.ok && !API_URL) throw new Error('No pudimos enviar tu registro. Tus datos siguen guardados; inténtalo de nuevo.');
+    }
     setStatus('', false);
+    return ticket;
   }
 
   // Alterna entre formulario y mensaje de agradecimiento
@@ -443,10 +469,11 @@ const LPAdmin = (() => {
     if (!LPForm.validate()) return;
 
     // Envío real a Formspree (POST). Si falla, se conservan los datos del borrador.
-    const submitBtn = event.target.querySelector('button[type="submit"]');
+    let apiTicket = null;
+  const submitBtn = event.target.querySelector('button[type="submit"]');
     if (submitBtn) submitBtn.disabled = true;
     try {
-      await LPForm.send({ nombre: name, correo: email, rol: role, modalidad: attendance, organizacion: org });
+      apiTicket = await LPForm.send({ nombre: name, correo: email, rol: role, modalidad: attendance, organizacion: org });
     } catch (err) {
       LPForm.setStatus(err.message || 'No pudimos enviar tu registro. Tus datos siguen guardados; inténtalo de nuevo.', true);
       if (submitBtn) submitBtn.disabled = false;
@@ -458,7 +485,7 @@ const LPAdmin = (() => {
     const randomSeq = Math.floor(1000 + Math.random() * 9000);
     const newRecord = {
       id: 'reg-' + Date.now(),
-      ticketNumber: `JAI-BOY-2026-${randomSeq}`,
+      ticketNumber: apiTicket || `JAI-BOY-2026-${randomSeq}`,
       fullName: name,
       email: email,
       role: role,

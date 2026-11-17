@@ -97,7 +97,8 @@ landing-page-proyecto_Unidad_3/
 ├── script.js           # Interactividad: animaciones, cuenta regresiva y registros
 ├── images/             # Imágenes del hero y de los ponentes
 ├── docs/               # Recursos de documentación (captura del README)
-├── docs/db/            # Esquemas SQL y script de referencia (no se ejecutan en GitHub Pages)
+├── api/                # API REST (Node.js + MariaDB) que guarda los registros
+├── docs/db/            # Esquema MariaDB y scripts de instalación (no se ejecutan en GitHub Pages)
 ├── LICENSE
 └── README.md
 ```
