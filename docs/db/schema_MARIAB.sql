@@ -1,149 +1,126 @@
 -- =====================================================================
--- JAVA & AI DAY BOYACÁ 2026 - BASE DE DATOS: MARIAB
--- Sede: Auditorio Paraninfo San Jerónimo · UPTC Tunja
--- Fechas Oficiales: 4 y 5 de Diciembre, 2026
--- Proyecto Unidad 3 UPTC: María Medina, Natalia Cruz, Jonathan Stick GB
--- =====================================================================
--- INSTRUCCIONES DE EJECUCIÓN MANUAL:
---
--- Opción A: Vía psql con PostgreSQL local instalado:
---   psql -U postgres -c "CREATE DATABASE \"MARIAB\";"
----   psql -U postgres -d MARIAB -f schema_MARIAB.sql
---
--- Opción B: Vía Docker (un solo comando):
---   docker run --name postgres-mariab -e POSTGRES_DB=MARIAB -e POSTGRES_USER=mariab_admin -e POSTGRES_PASSWORD=tu_clave_segura -p 5432:5432 -d postgres:16-alpine
---   docker exec -i postgres-mariab psql -U mariab_admin -d MARIAB < schema_MARIAB.sql
+-- JAVA & AI DAY BOYACÁ 2026 - BASE DE DATOS: MARIAB (MariaDB 10.5+ / XAMPP)
+-- Importar desde phpMyAdmin > Importar, o usar setup_manual_mariab.sh
 -- =====================================================================
 
--- 1. Habilitar extensión para identificadores universales (UUIDs)
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE DATABASE IF NOT EXISTS mariab
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_general_ci;
 
--- 2. Limpieza preventiva controlada
-DROP TABLE IF EXISTS attendee_audit_log CASCADE;
-DROP TABLE IF EXISTS attendees CASCADE;
-DROP TYPE IF EXISTS attendee_role CASCADE;
-DROP TYPE IF EXISTS attendance_type CASCADE;
-DROP TYPE IF EXISTS primary_track CASCADE;
-DROP TYPE IF EXISTS attendee_status CASCADE;
+USE mariab;
 
--- 3. Tipos enumerados estrictos para integridad de dominio
-CREATE TYPE attendee_role AS ENUM (
-    'Estudiante UPTC',
-    'Estudiante Otra Universidad',
-    'Desarrollador / Ingeniero',
-    'Docente / Investigador',
-    'Líder Tech / Empresa'
-);
+-- Limpieza preventiva
+DROP TRIGGER IF EXISTS trg_audit_attendees_insert;
+DROP TRIGGER IF EXISTS trg_audit_attendees_update;
+DROP TRIGGER IF EXISTS trg_audit_attendees_delete;
+DROP TABLE IF EXISTS attendee_audit_log;
+DROP TABLE IF EXISTS attendees;
 
-CREATE TYPE attendance_type AS ENUM (
-    'presencial',
-    'streaming'
-);
-
-CREATE TYPE primary_track AS ENUM (
-    'Ambos (Java + IA)',
-    'Core Java & Loom',
-    'IA Generativa & LangChain4j'
-);
-
-CREATE TYPE attendee_status AS ENUM (
-    'confirmado',
-    'checkin',
-    'pendiente',
-    'cancelado'
-);
-
--- 4. Tabla principal de Asistentes y Acreditaciones (Base de Datos MARIAB)
+-- Tabla principal de asistentes (ENUM definidos en la columna)
 CREATE TABLE attendees (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    full_name VARCHAR(100) NOT NULL CHECK (char_length(trim(full_name)) >= 3),
-    email VARCHAR(120) NOT NULL CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'),
-    role attendee_role NOT NULL DEFAULT 'Estudiante UPTC',
+    id CHAR(36) NOT NULL DEFAULT (UUID()),
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(120) NOT NULL,
+    role ENUM(
+        'Estudiante UPTC',
+        'Estudiante Otra Universidad',
+        'Desarrollador / Ingeniero',
+        'Docente / Investigador',
+        'Líder Tech / Empresa'
+    ) NOT NULL DEFAULT 'Estudiante UPTC',
     organization VARCHAR(120) NOT NULL DEFAULT 'UPTC',
-    attendance_type attendance_type NOT NULL DEFAULT 'presencial',
-    primary_track primary_track NOT NULL DEFAULT 'Ambos (Java + IA)',
-    ticket_number VARCHAR(64) NOT NULL UNIQUE CHECK (ticket_number ~ '^JAI-BOY-2026-[0-9]{4}$'),
-    status attendee_status NOT NULL DEFAULT 'confirmado',
-    notes TEXT CHECK (notes IS NULL OR char_length(notes) <= 500),
+    attendance_type ENUM('presencial', 'streaming') NOT NULL DEFAULT 'presencial',
+    primary_track ENUM(
+        'Ambos (Java + IA)',
+        'Core Java & Loom',
+        'IA Generativa & LangChain4j'
+    ) NOT NULL DEFAULT 'Ambos (Java + IA)',
+    ticket_number VARCHAR(64) NOT NULL,
+    status ENUM('confirmado', 'checkin', 'pendiente', 'cancelado') NOT NULL DEFAULT 'confirmado',
+    notes TEXT NULL,
     user_id VARCHAR(128) NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_attendees_ticket (ticket_number),
+    CONSTRAINT chk_full_name CHECK (CHAR_LENGTH(TRIM(full_name)) >= 3),
+    CONSTRAINT chk_email CHECK (email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'),
+    CONSTRAINT chk_ticket CHECK (ticket_number REGEXP '^JAI-BOY-2026-[0-9]{4}$'),
+    CONSTRAINT chk_notes CHECK (notes IS NULL OR CHAR_LENGTH(notes) <= 500)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- 5. Índices de alto rendimiento para el control de acceso en Diciembre 2026
+-- Índices
 CREATE INDEX idx_attendees_email ON attendees(email);
-CREATE INDEX idx_attendees_ticket ON attendees(ticket_number);
 CREATE INDEX idx_attendees_status ON attendees(status);
-CREATE INDEX idx_attendees_created_at ON attendees(created_at DESC);
+CREATE INDEX idx_attendees_created_at ON attendees(created_at);
 
--- 6. Trigger para actualización automática del campo updated_at
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_attendees_updated_at
-BEFORE UPDATE ON attendees
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
-
--- 7. Tabla de Auditoría de Cambios (Audit Trail en BD MARIAB)
+-- Tabla de auditoría
 CREATE TABLE attendee_audit_log (
-    audit_id SERIAL PRIMARY KEY,
-    attendee_id UUID NOT NULL,
-    action VARCHAR(20) NOT NULL, -- INSERT, UPDATE, DELETE
-    changed_by VARCHAR(120) DEFAULT CURRENT_USER,
-    old_data JSONB,
-    new_data JSONB,
-    occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+    audit_id INT NOT NULL AUTO_INCREMENT,
+    attendee_id CHAR(36) NOT NULL,
+    action VARCHAR(20) NOT NULL,
+    changed_by VARCHAR(120) NOT NULL DEFAULT '',
+    old_data LONGTEXT NULL,
+    new_data LONGTEXT NULL,
+    occurred_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (audit_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE OR REPLACE FUNCTION audit_attendee_changes()
-RETURNS TRIGGER AS $$
+-- Triggers de auditoría (MariaDB necesita uno por evento)
+DELIMITER $$
+
+CREATE TRIGGER trg_audit_attendees_insert
+AFTER INSERT ON attendees
+FOR EACH ROW
 BEGIN
-    IF (TG_OP = 'INSERT') THEN
-        INSERT INTO attendee_audit_log (attendee_id, action, new_data)
-        VALUES (NEW.id, 'INSERT', to_jsonb(NEW));
-    ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO attendee_audit_log (attendee_id, action, old_data, new_data)
-        VALUES (NEW.id, 'UPDATE', to_jsonb(OLD), to_jsonb(NEW));
-    ELSIF (TG_OP = 'DELETE') THEN
-        INSERT INTO attendee_audit_log (attendee_id, action, old_data)
-        VALUES (OLD.id, 'DELETE', to_jsonb(OLD));
-    END IF;
-    RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
+    INSERT INTO attendee_audit_log (attendee_id, action, changed_by, new_data)
+    VALUES (NEW.id, 'INSERT', CURRENT_USER(),
+        JSON_OBJECT('id', NEW.id, 'full_name', NEW.full_name, 'email', NEW.email,
+                    'role', NEW.role, 'organization', NEW.organization,
+                    'attendance_type', NEW.attendance_type, 'primary_track', NEW.primary_track,
+                    'ticket_number', NEW.ticket_number, 'status', NEW.status, 'notes', NEW.notes));
+END$$
 
-CREATE TRIGGER trg_audit_attendees
-AFTER INSERT OR UPDATE OR DELETE ON attendees
-FOR EACH ROW EXECUTE FUNCTION audit_attendee_changes();
+CREATE TRIGGER trg_audit_attendees_update
+AFTER UPDATE ON attendees
+FOR EACH ROW
+BEGIN
+    INSERT INTO attendee_audit_log (attendee_id, action, changed_by, old_data, new_data)
+    VALUES (NEW.id, 'UPDATE', CURRENT_USER(),
+        JSON_OBJECT('id', OLD.id, 'full_name', OLD.full_name, 'email', OLD.email,
+                    'role', OLD.role, 'organization', OLD.organization,
+                    'attendance_type', OLD.attendance_type, 'primary_track', OLD.primary_track,
+                    'ticket_number', OLD.ticket_number, 'status', OLD.status, 'notes', OLD.notes),
+        JSON_OBJECT('id', NEW.id, 'full_name', NEW.full_name, 'email', NEW.email,
+                    'role', NEW.role, 'organization', NEW.organization,
+                    'attendance_type', NEW.attendance_type, 'primary_track', NEW.primary_track,
+                    'ticket_number', NEW.ticket_number, 'status', NEW.status, 'notes', NEW.notes));
+END$$
 
--- 8. Seguridad a nivel de fila (Row Level Security - RLS)
-ALTER TABLE attendees ENABLE ROW LEVEL SECURITY;
+CREATE TRIGGER trg_audit_attendees_delete
+AFTER DELETE ON attendees
+FOR EACH ROW
+BEGIN
+    INSERT INTO attendee_audit_log (attendee_id, action, changed_by, old_data)
+    VALUES (OLD.id, 'DELETE', CURRENT_USER(),
+        JSON_OBJECT('id', OLD.id, 'full_name', OLD.full_name, 'email', OLD.email,
+                    'role', OLD.role, 'organization', OLD.organization,
+                    'attendance_type', OLD.attendance_type, 'primary_track', OLD.primary_track,
+                    'ticket_number', OLD.ticket_number, 'status', OLD.status, 'notes', OLD.notes));
+END$$
 
-CREATE POLICY policy_read_attendees ON attendees
-    FOR SELECT
-    USING (true);
+DELIMITER ;
 
-CREATE POLICY policy_insert_attendees ON attendees
-    FOR INSERT
-    WITH CHECK (true);
+-- Nota: Row Level Security (RLS) no existe en MariaDB; el control de acceso
+-- (solo el administrador edita/elimina) se hará en la capa PHP o con usuarios de BD.
 
-CREATE POLICY policy_update_attendees ON attendees
-    FOR UPDATE
-    USING (true);
-
--- 9. Datos Semilla Oficiales - 4 y 5 de Diciembre 2026 (UPTC Tunja)
+-- Datos semilla
 INSERT INTO attendees (full_name, email, role, organization, attendance_type, primary_track, ticket_number, status, notes)
 VALUES
-    ('Ing. Julián Camilo Vargas', 'julian.vargas@uptc.edu.co', 'Desarrollador / Ingeniero', 'UPTC - Grupo SInC', 'presencial', 'Ambos (Java + IA)', 'JAI-BOY-2026-1042', 'confirmado', 'Participante del track de Inteligencia Artificial.'),
-    ('Laura Marcela Pinzón', 'laura.pinzon@tunja-tech.org', 'Estudiante UPTC', 'Escuela de Sistemas UPTC', 'presencial', 'Core Java & Loom', 'JAI-BOY-2026-1088', 'checkin', 'Acreditación presencial verificada en Paraninfo San Jerónimo.'),
-    ('David Esteban Roa', 'david.roa@boyacadevs.org', 'Líder Tech / Empresa', 'Boyacá Devs / Sogamoso Lab', 'presencial', 'IA Generativa & LangChain4j', 'JAI-BOY-2026-1120', 'confirmado', 'Coordinador del track de innovación abierta.'),
-    ('Dra. María Elena Castañeda', 'maria.castaneda@uptc.edu.co', 'Docente / Investigador', 'Facultad de Ingeniería UPTC', 'presencial', 'Ambos (Java + IA)', 'JAI-BOY-2026-1155', 'confirmado', 'Docente titular en Sistemas Distribuidos.');
+    ('Ing. Julián Camilo Vargas', 'julian.vargas@example.com', 'Desarrollador / Ingeniero', 'UPTC - Grupo SInC', 'presencial', 'Ambos (Java + IA)', 'JAI-BOY-2026-1042', 'confirmado', 'Participante del track de Inteligencia Artificial.'),
+    ('Laura Marcela Pinzón', 'laura.pinzon@example.com', 'Estudiante UPTC', 'Escuela de Sistemas UPTC', 'presencial', 'Core Java & Loom', 'JAI-BOY-2026-1088', 'checkin', 'Acreditación presencial verificada en Paraninfo San Jerónimo.'),
+    ('David Esteban Roa', 'david.roa@example.com', 'Líder Tech / Empresa', 'Boyacá Devs / Sogamoso Lab', 'presencial', 'IA Generativa & LangChain4j', 'JAI-BOY-2026-1120', 'confirmado', 'Coordinador del track de innovación abierta.'),
+    ('Dra. María Elena Castañeda', 'maria.castaneda@example.com', 'Docente / Investigador', 'Facultad de Ingeniería UPTC', 'presencial', 'Ambos (Java + IA)', 'JAI-BOY-2026-1155', 'confirmado', 'Docente titular en Sistemas Distribuidos.');
 
--- 10. Consulta de Verificación
+-- Verificación
 SELECT id, full_name, role, ticket_number, status, created_at FROM attendees;
