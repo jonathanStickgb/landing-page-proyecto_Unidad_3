@@ -4,12 +4,14 @@
   "description": "API REST mínima para la landing Java & AI Day Boyacá 2026 (MariaDB)",
   "type": "module",
   "private": true,
-  "engines": { "node": ">=22.9" },
+  "engines": {
+    "node": ">=22.9"
+  },
   "scripts": {
     "start": "node --env-file-if-exists=.env src/server.js",
     "test": "node --test test/*.test.js"
   },
   "dependencies": {
-    "mysql2": "3.11.0"
+    "mysql2": "3.23.1"
   }
 }
