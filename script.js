@@ -132,7 +132,7 @@ const LPForm = (() => {
   'use strict';
 
   // Reemplaza por tu endpoint: https://formspree.io/f/xxxxxxxx (formspree.io → New Form)
-  const FORMSPREE_ENDPOINT = 'https://formspree.io/f/REEMPLAZAR_CON_TU_ID';
+  const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xljbnvdl';
   // URL pública (HTTPS) de la API MARIAB, sin barra final. Vacío = no se usa la API.
   // Ejemplo: 'https://mariab-api.onrender.com'
   const API_URL = '';
