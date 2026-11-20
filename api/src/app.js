@@ -41,6 +41,8 @@ export function createApp({ db, config }) {
 
   function limited(ip) {
     const now = Date.now();
+    // Limpieza de entradas vencidas para que el mapa no crezca sin límite
+    if (hits.size > 1000) for (const [k, v] of hits) if (v.resetAt <= now) hits.delete(k);
     const h = hits.get(ip);
     if (!h || h.resetAt <= now) { hits.set(ip, { count: 1, resetAt: now + rateLimit.windowMs }); return false; }
     h.count += 1;
@@ -100,13 +102,15 @@ export function createApp({ db, config }) {
     const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit'), 10) || 50, 1), 200);
     const offset = Math.max(parseInt(url.searchParams.get('offset'), 10) || 0, 0);
     const q = `%${str(url.searchParams.get('q')).slice(0, 60).replace(/[\\%_]/g, '\\$&')}%`;
+    const where = 'WHERE full_name LIKE ? OR email LIKE ? OR ticket_number LIKE ?';
+    const [{ total }] = await db.query(`SELECT COUNT(*) AS total FROM attendees ${where}`, [q, q, q]);
     const rows = await db.query(
       `SELECT id, ticket_number, full_name, email, role, organization, attendance_type, status, created_at
-         FROM attendees WHERE full_name LIKE ? OR email LIKE ? OR ticket_number LIKE ?
+         FROM attendees ${where}
          ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`,
       [q, q, q]
     );
-    send(res, 200, { ok: true, total: rows.length, data: rows });
+    send(res, 200, { ok: true, total: Number(total), limit, offset, data: rows });
   }
 
   async function updateAttendee(req, res, id) {
@@ -115,14 +119,20 @@ export function createApp({ db, config }) {
     const sets = []; const params = [];
     for (const [key, [col, allowed]] of Object.entries(map)) {
       if (b[key] === undefined) continue;
-      const val = str(b[key]);
+      const val = key === 'correo' ? str(b[key]).toLowerCase() : str(b[key]);
       if (allowed && !allowed.includes(val)) throw new HttpError(400, `Valor no permitido para ${key}.`);
       if (key === 'correo' && !EMAIL_RE.test(val)) throw new HttpError(400, 'Correo inválido.');
       if (key === 'nombre' && val.length < 3) throw new HttpError(400, 'Nombre demasiado corto.');
       sets.push(`${col} = ?`); params.push(val);
     }
     if (!sets.length) throw new HttpError(400, 'No hay campos para actualizar.');
-    const r = await db.query(`UPDATE attendees SET ${sets.join(', ')} WHERE id = ?`, [...params, id]);
+    let r;
+    try {
+      r = await db.query(`UPDATE attendees SET ${sets.join(', ')} WHERE id = ?`, [...params, id]);
+    } catch (e) {
+      if (e.errno === 1062 || e.code === 'ER_DUP_ENTRY') throw new HttpError(409, 'Este correo ya está registrado.');
+      throw e;
+    }
     if (!r.affectedRows) throw new HttpError(404, 'Registro no encontrado.');
     send(res, 200, { ok: true });
   }

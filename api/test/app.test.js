@@ -15,8 +15,13 @@ function fakeDb() {
         rows.push({ id: '11111111-1111-1111-1111-111111111111', full_name: p[0], email: p[1], ticket_number: p[5], status: 'confirmado' });
         return { affectedRows: 1 };
       }
+      if (sql.startsWith('SELECT COUNT(*)')) return [{ total: rows.length }];
       if (sql.includes('FROM attendees')) return rows;
-      if (sql.startsWith('UPDATE') || sql.startsWith('DELETE')) return { affectedRows: rows.length ? 1 : 0 };
+      if (sql.startsWith('UPDATE')) {
+        if (this.dupOnUpdate) throw Object.assign(new Error("Duplicate entry for key 'uq_attendees_email'"), { errno: 1062 });
+        return { affectedRows: rows.length ? 1 : 0 };
+      }
+      if (sql.startsWith('DELETE')) return { affectedRows: rows.length ? 1 : 0 };
       throw new Error('SQL inesperado: ' + sql);
     }
   };
@@ -83,6 +88,20 @@ test('PATCH valida estado y uuid', async () => {
   assert.equal((await fetch(`${s.base}/api/attendees/${id}`, { method: 'PATCH', headers: h, body: JSON.stringify({ status: 'checkin' }) })).status, 200);
   assert.equal((await fetch(`${s.base}/api/attendees/${id}`, { method: 'PATCH', headers: h, body: JSON.stringify({ status: 'hack' }) })).status, 400);
   assert.equal((await fetch(`${s.base}/api/attendees/no-uuid`, { method: 'DELETE', headers: h })).status, 400); s.close();
+});
+test('PATCH con correo duplicado devuelve 409 y normaliza a minúsculas', async () => {
+  const s = await boot(); await post(s.base, valid);
+  const h = { Authorization: 'Bearer ' + 'a'.repeat(24), 'Content-Type': 'application/json' };
+  const url = `${s.base}/api/attendees/11111111-1111-1111-1111-111111111111`;
+  s.db.dupOnUpdate = true;
+  assert.equal((await fetch(url, { method: 'PATCH', headers: h, body: JSON.stringify({ correo: 'Otro@Example.com' }) })).status, 409);
+  s.close();
+});
+test('GET listado devuelve el total real, limit y offset', async () => {
+  const s = await boot(); await post(s.base, valid);
+  const r = await fetch(s.base + '/api/attendees?limit=1&offset=0', { headers: { Authorization: 'Bearer ' + 'a'.repeat(24) } });
+  const j = await r.json();
+  assert.equal(r.status, 200); assert.equal(j.total, 1); assert.equal(j.limit, 1); assert.equal(j.offset, 0); s.close();
 });
 test('CORS: permite el origen configurado y bloquea otros en preflight', async () => {
   const s = await boot();
