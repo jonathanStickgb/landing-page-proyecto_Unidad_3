@@ -135,7 +135,7 @@ const LPForm = (() => {
   const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xljbnvdl';
   // URL pública (HTTPS) de la API MARIAB, sin barra final. Vacío = no se usa la API.
   // Ejemplo: 'https://mariab-api.onrender.com'
-  const API_URL = '';
+  const API_URL = 'http://localhost:3000';
   const NS = 'lp_jai2026_';
   const CONVERTED_KEY = NS + 'convertido';
   // id del campo en el HTML -> sufijo de la clave de almacenamiento
