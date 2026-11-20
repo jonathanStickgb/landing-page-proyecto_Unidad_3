@@ -43,6 +43,6 @@ Consultas preparadas (sin SQL concatenado), validación con listas cerradas, COR
 ## Conectar la landing
 1. Publica la API con **HTTPS** (GitHub Pages es HTTPS; el navegador bloquea llamadas a HTTP). Opciones: Render, Railway o un VPS con Nginx. La base debe ser accesible desde ese servidor.
 2. En `.env` del servidor: `ALLOWED_ORIGINS=https://jonathanstickgb.github.io`.
-3. En `script.js` (módulo `LPForm`) escribe la URL en `API_URL`.
+3. En `script.js`, al inicio del archivo, escribe la URL pública (HTTPS, sin barra final) en `MARIAB_API_URL_PRODUCCION`. En tu computador (`localhost` o `127.0.0.1`) la página usa sola `MARIAB_API_URL_LOCAL`, así que no hay que cambiarla para desarrollar. Mientras `MARIAB_API_URL_PRODUCCION` esté vacía, el sitio publicado envía el formulario solo a Formspree y el panel de administrador queda deshabilitado.
 
 El panel de administración de la página sigue siendo una demo local: **no pongas el token de administrador en el navegador**. Usa los endpoints `GET/PATCH/DELETE` con Postman o `curl`.

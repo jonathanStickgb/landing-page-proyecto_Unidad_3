@@ -13,9 +13,16 @@
  * =====================================================================
  */
 
-/* URL de la API MARIAB, sin barra final. Al desplegar la API, cambia SOLO esta línea
-   (por ejemplo 'https://mariab-api.onrender.com'). */
-const MARIAB_API_URL = 'http://localhost:3000';
+/* URL de la API MARIAB, sin barra final. Se elige sola según dónde se abra la página:
+   - En tu computador (localhost / 127.0.0.1) usa la API local.
+   - En el sitio publicado usa MARIAB_API_URL_PRODUCCION. Al desplegar la API, cambia SOLO esa
+     línea (por ejemplo 'https://mariab-api.onrender.com'). Vacía = sin API: el formulario envía
+     únicamente a Formspree y el panel de administrador queda deshabilitado. */
+const MARIAB_API_URL_LOCAL = 'http://localhost:3000';
+const MARIAB_API_URL_PRODUCCION = '';
+const MARIAB_API_URL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)
+  ? MARIAB_API_URL_LOCAL
+  : MARIAB_API_URL_PRODUCCION;
 
 /* ---------- LPModal: ventanas modales ---------- */
 const LPModal = (() => {
@@ -339,6 +346,7 @@ const LPAdmin = (() => {
 
   // Llamada a la API con el token de administrador
   async function api(path, { method = 'GET', body, token = adminToken } = {}) {
+    if (!MARIAB_API_URL) throw new ApiError(0, 'La API aún no está desplegada: el panel de administrador no está disponible en este sitio.');
     const headers = { Authorization: 'Bearer ' + token };
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     let res;
