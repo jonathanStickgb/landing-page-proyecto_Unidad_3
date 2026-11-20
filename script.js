@@ -8,10 +8,14 @@
  * sin variables ni funciones globales y sin manejadores inline en el HTML.
  *   LPModal   -> abrir/cerrar ventanas modales
  *   LPUi      -> reveal-on-scroll, cuenta regresiva y menú móvil
- *   LPForm    -> persistencia del formulario (localStorage + Formspree)
- *   LPAdmin   -> base MARIAB local y modo administrador
+ *   LPForm    -> formulario: borrador local, envío a la API (MariaDB) y Formspree
+ *   LPAdmin   -> panel de administración conectado a la API (MariaDB)
  * =====================================================================
  */
+
+/* URL de la API MARIAB, sin barra final. Al desplegar la API, cambia SOLO esta línea
+   (por ejemplo 'https://mariab-api.onrender.com'). */
+const MARIAB_API_URL = 'http://localhost:3000';
 
 /* ---------- LPModal: ventanas modales ---------- */
 const LPModal = (() => {
@@ -133,9 +137,8 @@ const LPForm = (() => {
 
   // Reemplaza por tu endpoint: https://formspree.io/f/xxxxxxxx (formspree.io → New Form)
   const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xljbnvdl';
-  // URL pública (HTTPS) de la API MARIAB, sin barra final. Vacío = no se usa la API.
-  // Ejemplo: 'https://mariab-api.onrender.com'
-  const API_URL = 'http://localhost:3000';
+  // La URL de la API se define arriba (MARIAB_API_URL). Vacío = no se usa la API.
+  const API_URL = MARIAB_API_URL;
   const NS = 'lp_jai2026_';
   const CONVERTED_KEY = NS + 'convertido';
   // id del campo en el HTML -> sufijo de la clave de almacenamiento
@@ -279,114 +282,107 @@ const LPForm = (() => {
   return { init, validate, send, setStatus, markConverted, clearDraft };
 })();
 
-/* ---------- LPAdmin: base MARIAB local y modo administrador ---------- */
+/* ---------- LPAdmin: panel de administración conectado a la API MARIAB (MariaDB) ---------- */
 const LPAdmin = (() => {
   'use strict';
   const { open: openModal, close: closeModal } = LPModal;
+
   /**
    * =====================================================================
-   * BASE DE DATOS MARIAB (Persistencia Local en Navegador)
+   * PANEL DE ADMINISTRACIÓN (datos reales en MariaDB, a través de la API)
+   * ---------------------------------------------------------------------
+   * - Listar, editar, hacer check-in y eliminar se hace contra la API.
+   * - La API exige el ADMIN_TOKEN (archivo api/.env) en el encabezado
+   *   Authorization. Ese token NO está en este archivo: lo escribe el
+   *   administrador en el modal y se guarda solo en sessionStorage
+   *   (se borra al cerrar la pestaña).
+   * - La seguridad real la aplica el servidor; esta pantalla solo muestra
+   *   u oculta botones.
    * =====================================================================
    */
-  const MARIAB_STORAGE_KEY = 'MARIAB_DB_ATTENDEES_2026';
-  let mariaBAttendees = [];
+  const TOKEN_KEY = 'MARIAB_ADMIN_TOKEN';
+  const LEGACY_LOCAL_KEY = 'MARIAB_DB_ATTENDEES_2026'; // datos de demostración antiguos
+  let adminToken = '';
+  let isAdmin = false;
+  let attendees = [];
+  let searchTimer = null;
 
-  const INITIAL_MARIAB_SEEDS = [
-    {
-      id: 'seed-1',
-      ticketNumber: 'JAI-BOY-2026-1042',
-      fullName: 'Ing. Julián Camilo Vargas',
-      email: 'julian.vargas@example.com',
-      role: 'Desarrollador / Ingeniero',
-      organization: 'UPTC - Grupo SInC',
-      attendanceType: 'presencial',
-      status: 'confirmado',
-      track: 'Ambos (Java + IA)'
-    },
-    {
-      id: 'seed-2',
-      ticketNumber: 'JAI-BOY-2026-1088',
-      fullName: 'Laura Marcela Pinzón',
-      email: 'laura.pinzon@example.com',
-      role: 'Estudiante UPTC',
-      organization: 'Escuela de Sistemas UPTC',
-      attendanceType: 'presencial',
-      status: 'checkin',
-      track: 'Core Java & Loom'
-    },
-    {
-      id: 'seed-3',
-      ticketNumber: 'JAI-BOY-2026-1120',
-      fullName: 'David Esteban Roa',
-      email: 'david.roa@example.com',
-      role: 'Líder Tech / Empresa',
-      organization: 'Boyacá Devs',
-      attendanceType: 'presencial',
-      status: 'confirmado',
-      track: 'IA Generativa & LangChain4j'
-    },
-    {
-      id: 'seed-4',
-      ticketNumber: 'JAI-BOY-2026-1155',
-      fullName: 'Dra. María Elena Castañeda',
-      email: 'maria.castaneda@example.com',
-      role: 'Docente / Investigador',
-      organization: 'Facultad de Ingeniería UPTC',
-      attendanceType: 'presencial',
-      status: 'confirmado',
-      track: 'Ambos (Java + IA)'
+  class ApiError extends Error {
+    constructor(status, message) {
+      super(message);
+      this.status = status;
     }
-  ];
+  }
 
-  function initMariaBStorage() {
-    const raw = localStorage.getItem(MARIAB_STORAGE_KEY);
-    if (raw) {
-      try {
-        mariaBAttendees = JSON.parse(raw);
-      } catch (e) {
-        mariaBAttendees = [...INITIAL_MARIAB_SEEDS];
-      }
-    } else {
-      mariaBAttendees = [...INITIAL_MARIAB_SEEDS];
-      saveMariaBStorage();
+  const $ = (id) => document.getElementById(id);
+
+  function escapeHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function readToken() {
+    try { return sessionStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; }
+  }
+  function saveToken(token) {
+    try {
+      if (token) sessionStorage.setItem(TOKEN_KEY, token);
+      else sessionStorage.removeItem(TOKEN_KEY);
+    } catch (e) { /* sin almacenamiento: la sesión dura hasta recargar */ }
+  }
+
+  // Llamada a la API con el token de administrador
+  async function api(path, { method = 'GET', body, token = adminToken } = {}) {
+    const headers = { Authorization: 'Bearer ' + token };
+    if (body !== undefined) headers['Content-Type'] = 'application/json';
+    let res;
+    try {
+      res = await fetch(MARIAB_API_URL + path, {
+        method,
+        headers,
+        body: body !== undefined ? JSON.stringify(body) : undefined
+      });
+    } catch (e) {
+      throw new ApiError(0, 'No se pudo contactar la API. Verifica que esté encendida y que este sitio tenga permiso (CORS).');
     }
-    renderMariaBTable(mariaBAttendees);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new ApiError(res.status, data.error || 'Error ' + res.status);
+    return data;
   }
 
-  function saveMariaBStorage() {
-    localStorage.setItem(MARIAB_STORAGE_KEY, JSON.stringify(mariaBAttendees));
-    updateCounts();
+  /* ---------- Tabla ---------- */
+  function setCount(value) {
+    const el = $('recordCount');
+    if (el) el.textContent = value;
   }
 
-  function updateCounts() {
-    const countEl = document.getElementById('recordCount');
-    if (countEl) countEl.textContent = mariaBAttendees.length;
-  }
-
-  function renderMariaBTable(data) {
-    const tbody = document.getElementById('attendeesTableBody');
+  function renderMessage(text) {
+    const tbody = $('attendeesTableBody');
     if (!tbody) return;
-    tbody.innerHTML = '';
-    updateCounts();
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="py-8 text-center text-[#a8998a] font-mono text-xs">${escapeHtml(text)}</td>
+      </tr>`;
+  }
 
-    if (data.length === 0) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="6" class="py-8 text-center text-[#a8998a] font-mono text-xs">
-            No se encontraron registros en la base de datos MARIAB.
-          </td>
-        </tr>
-      `;
-      return;
-    }
+  function statusClass(status) {
+    if (status === 'checkin') return 'bg-[#00e676]/10 text-[#00e676] border border-[#00e676]/30';
+    if (status === 'cancelado') return 'bg-red-500/10 text-red-400 border border-red-400/30';
+    return 'bg-[#f89820]/10 text-[#f89820] border border-[#f89820]/30';
+  }
 
-    data.forEach((item) => {
-      const tr = document.createElement('tr');
-      tr.className = 'hover:bg-white/[0.03] transition-colors border-b border-white/5';
-      tr.innerHTML = `
-        <td class="py-3 px-4 font-mono font-bold text-[#f89820] text-xs">${item.ticketNumber}</td>
+  function rowHtml(item) {
+    const id = escapeHtml(item.id);
+    const presencial = item.attendance_type === 'presencial';
+    return `
+      <tr class="hover:bg-white/[0.03] transition-colors border-b border-white/5">
+        <td class="py-3 px-4 font-mono font-bold text-[#f89820] text-xs">${escapeHtml(item.ticket_number)}</td>
         <td class="py-3 px-4">
-          <div class="font-bold text-[#fbf7f2] text-xs">${escapeHtml(item.fullName)}</div>
+          <div class="font-bold text-[#fbf7f2] text-xs">${escapeHtml(item.full_name)}</div>
           <div class="text-[11px] text-[#a8998a] font-mono">${escapeHtml(item.email)}</div>
         </td>
         <td class="py-3 px-4 text-xs">
@@ -394,86 +390,119 @@ const LPAdmin = (() => {
           <div class="text-[11px] text-[#a8998a]">${escapeHtml(item.organization)}</div>
         </td>
         <td class="py-3 px-4 text-xs font-mono uppercase text-[11px]">
-          <span class="${item.attendanceType === 'presencial' ? 'text-[#f89820]' : 'text-[#5382a1]'}">
-            ${item.attendanceType}
-          </span>
+          <span class="${presencial ? 'text-[#f89820]' : 'text-[#5382a1]'}">${escapeHtml(item.attendance_type)}</span>
         </td>
         <td class="py-3 px-4 text-xs">
-          <span class="px-2 py-0.5 rounded text-[10px] font-mono ${
-            item.status === 'checkin'
-              ? 'bg-[#00e676]/10 text-[#00e676] border border-[#00e676]/30'
-              : 'bg-[#f89820]/10 text-[#f89820] border border-[#f89820]/30'
-          }">
-            ${item.status}
-          </span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono ${statusClass(item.status)}">${escapeHtml(item.status)}</span>
         </td>
         <td class="py-3 px-4 text-right text-xs">
-          <button data-action="checkin" data-id="${escapeHtml(item.id)}" class="px-2 py-1 text-[11px] font-mono text-[#00e676] hover:underline">
+          <button data-action="checkin" data-id="${id}" class="px-2 py-1 text-[11px] font-mono text-[#00e676] hover:underline">
             ${item.status === 'checkin' ? 'Check-out' : 'Check-in'}
           </button>
-          ${
-            isAdmin
-              ? `<button data-action="edit" data-id="${escapeHtml(item.id)}" class="px-2 py-1 text-[11px] font-mono text-[#f89820] hover:underline ml-2">
-                   Editar
-                 </button>
-                 <button data-action="delete" data-id="${escapeHtml(item.id)}" class="px-2 py-1 text-[11px] font-mono text-red-400 hover:underline ml-2">
-                   Eliminar
-                 </button>`
-              : ''
-          }
+          <button data-action="edit" data-id="${id}" class="px-2 py-1 text-[11px] font-mono text-[#f89820] hover:underline ml-2">Editar</button>
+          <button data-action="delete" data-id="${id}" class="px-2 py-1 text-[11px] font-mono text-red-400 hover:underline ml-2">Eliminar</button>
         </td>
-      `;
-      tbody.appendChild(tr);
-    });
+      </tr>`;
+  }
+
+  function renderTable() {
+    const tbody = $('attendeesTableBody');
+    if (!tbody) return;
+    if (!isAdmin) {
+      setCount('—');
+      renderMessage('Inicia sesión como administrador para ver los registros guardados en MariaDB.');
+      return;
+    }
+    setCount(attendees.length);
+    if (!attendees.length) {
+      renderMessage('No se encontraron registros en la base de datos.');
+      return;
+    }
+    tbody.innerHTML = attendees.map(rowHtml).join('');
+  }
+
+  // Carga los registros desde la API (el filtro de búsqueda lo aplica el servidor)
+  async function loadAttendees() {
+    if (!isAdmin) {
+      attendees = [];
+      renderTable();
+      return;
+    }
+    const q = ($('searchInput')?.value || '').trim();
+    renderMessage('Cargando registros…');
+    try {
+      const params = new URLSearchParams({ limit: '200' });
+      if (q) params.set('q', q);
+      const data = await api('/api/attendees?' + params.toString());
+      attendees = Array.isArray(data.data) ? data.data : [];
+      renderTable();
+    } catch (e) {
+      if (e.status === 401) {
+        setAdminMode(false);
+        renderMessage('La sesión de administrador no es válida. Vuelve a iniciar sesión.');
+        return;
+      }
+      attendees = [];
+      setCount('—');
+      renderMessage(e.message);
+    }
   }
 
   function filterAttendees() {
-    const query = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
-    const filtered = mariaBAttendees.filter(
-      (a) =>
-        a.fullName.toLowerCase().includes(query) ||
-        a.email.toLowerCase().includes(query) ||
-        a.ticketNumber.toLowerCase().includes(query) ||
-        a.organization.toLowerCase().includes(query)
-    );
-    renderMariaBTable(filtered);
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(loadAttendees, 300);
   }
 
-  function toggleCheckin(id) {
-    const item = mariaBAttendees.find((a) => a.id === id);
-    if (item) {
-      item.status = item.status === 'checkin' ? 'confirmado' : 'checkin';
-      saveMariaBStorage();
-      filterAttendees();
+  // Ejecuta una acción contra la API y recarga la tabla. Devuelve true si salió bien.
+  async function runAction(fn, hint500) {
+    try {
+      await fn();
+      await loadAttendees();
+      return true;
+    } catch (e) {
+      if (e.status === 401) {
+        setAdminMode(false);
+        alert('Tu sesión de administrador no es válida. Vuelve a iniciar sesión.');
+      } else if (e.status === 500 && hint500) {
+        alert(hint500);
+      } else {
+        alert(e.message || 'No se pudo completar la acción.');
+      }
+      return false;
     }
   }
 
-  function deleteAttendee(id) {
+  async function toggleCheckin(id) {
     if (!isAdmin) return;
-    if (confirm('¿Eliminar esta acreditación de la base de datos MARIAB?')) {
-      mariaBAttendees = mariaBAttendees.filter((a) => a.id !== id);
-      saveMariaBStorage();
-      filterAttendees();
-    }
+    const item = attendees.find((a) => a.id === id);
+    if (!item) return;
+    const status = item.status === 'checkin' ? 'confirmado' : 'checkin';
+    await runAction(() => api('/api/attendees/' + encodeURIComponent(id), { method: 'PATCH', body: { status } }));
   }
 
+  async function deleteAttendee(id) {
+    if (!isAdmin) return;
+    if (!confirm('¿Eliminar esta acreditación de la base de datos MARIAB?')) return;
+    await runAction(() => api('/api/attendees/' + encodeURIComponent(id), { method: 'DELETE' }));
+  }
+
+  /* ---------- Registro público (formulario) ---------- */
   async function handleFormSubmit(event) {
     event.preventDefault();
-    const name = document.getElementById('formName')?.value.trim();
-    const email = document.getElementById('formEmail')?.value.trim();
-    const role = document.getElementById('formRole')?.value;
-    const attendance = document.getElementById('formAttendance')?.value;
-    const org = document.getElementById('formOrg')?.value.trim() || 'UPTC Tunja';
+    const name = $('formName')?.value.trim();
+    const email = $('formEmail')?.value.trim();
+    const role = $('formRole')?.value;
+    const attendance = $('formAttendance')?.value;
+    const org = $('formOrg')?.value.trim() || 'UPTC Tunja';
 
     // Validación de campos (mensajes en pantalla, sin alert)
     if (!LPForm.validate()) return;
 
-    // Envío real a Formspree (POST). Si falla, se conservan los datos del borrador.
-    let apiTicket = null;
-  const submitBtn = event.target.querySelector('button[type="submit"]');
+    // Envío a la API (MariaDB) y a Formspree. Si falla, se conservan los datos del borrador.
+    const submitBtn = event.target.querySelector('button[type="submit"]');
     if (submitBtn) submitBtn.disabled = true;
     try {
-      apiTicket = await LPForm.send({ nombre: name, correo: email, rol: role, modalidad: attendance, organizacion: org });
+      await LPForm.send({ nombre: name, correo: email, rol: role, modalidad: attendance, organizacion: org });
     } catch (err) {
       LPForm.setStatus(err.message || 'No pudimos enviar tu registro. Tus datos siguen guardados; inténtalo de nuevo.', true);
       if (submitBtn) submitBtn.disabled = false;
@@ -481,93 +510,46 @@ const LPAdmin = (() => {
     }
     if (submitBtn) submitBtn.disabled = false;
 
-    // Registro local en MARIAB (demo del panel de administración)
-    const randomSeq = Math.floor(1000 + Math.random() * 9000);
-    const newRecord = {
-      id: 'reg-' + Date.now(),
-      ticketNumber: apiTicket || `JAI-BOY-2026-${randomSeq}`,
-      fullName: name,
-      email: email,
-      role: role,
-      organization: org,
-      attendanceType: attendance,
-      status: 'confirmado',
-      track: 'Ambos (Java + IA)'
-    };
-    mariaBAttendees.unshift(newRecord);
-    saveMariaBStorage();
-    filterAttendees();
+    // Si el administrador tiene la sesión abierta, la tabla muestra el nuevo registro
+    if (isAdmin) loadAttendees();
 
     // Limpia el borrador, marca al usuario como convertido y muestra el agradecimiento
     event.target.reset();
     LPForm.markConverted(name);
   }
 
-  /**
-   * =====================================================================
-   * MODO ADMINISTRADOR (editar y eliminar registros)
-   * ---------------------------------------------------------------------
-   * Nota: es un sitio estático en GitHub Pages, así que este acceso es
-   * una protección de interfaz para la demo, no una seguridad real.
-   * La contraseña no se guarda en texto plano: se compara su hash SHA-256.
-   * Para cambiarla, ejecuta en la consola del navegador:
-   *   await sha256('tu-nueva-clave')
-   * y pega el resultado en ADMIN_PASSWORD_HASH.
-   * =====================================================================
-   */
-  const ADMIN_PASSWORD_HASH = '4348565feaa25a1eacb3bd5b004362d7b5245caa0f29d54b2f88575a1d68f166';
-  const ADMIN_SESSION_KEY = 'MARIAB_ADMIN_SESSION';
-  let isAdmin = false;
-
-  async function sha256(text) {
-    const data = new TextEncoder().encode(text);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    return Array.from(new Uint8Array(hashBuffer))
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('');
-  }
-
+  /* ---------- Modo administrador ---------- */
   function initAdminSession() {
-    try {
-      isAdmin = sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true';
-    } catch (e) {
-      isAdmin = false;
-    }
+    adminToken = readToken();
+    isAdmin = Boolean(adminToken);
     updateAdminUI();
   }
 
   function setAdminMode(active) {
     isAdmin = active;
-    try {
-      if (active) {
-        sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
-      } else {
-        sessionStorage.removeItem(ADMIN_SESSION_KEY);
-      }
-    } catch (e) {
-      // Si el navegador bloquea sessionStorage, el modo dura hasta recargar.
+    if (!active) {
+      adminToken = '';
+      saveToken('');
+      attendees = [];
     }
     updateAdminUI();
-    filterAttendees();
+    loadAttendees();
   }
 
   function updateAdminUI() {
-    const badge = document.getElementById('adminBadge');
-    const btn = document.getElementById('adminToggleBtn');
+    const badge = $('adminBadge');
+    const btn = $('adminToggleBtn');
     if (badge) badge.classList.toggle('hidden', !isAdmin);
     if (btn) btn.textContent = isAdmin ? '🔓 Cerrar sesión' : '🔒 Acceso Administrador';
   }
 
   function handleAdminButton() {
     if (isAdmin) {
-      if (confirm('¿Cerrar la sesión de administrador?')) {
-        setAdminMode(false);
-      }
+      if (confirm('¿Cerrar la sesión de administrador?')) setAdminMode(false);
       return;
     }
-
-    const input = document.getElementById('adminPassword');
-    const error = document.getElementById('adminLoginError');
+    const input = $('adminPassword');
+    const error = $('adminLoginError');
     if (input) input.value = '';
     if (error) error.classList.add('hidden');
     openModal('adminLoginModal');
@@ -576,8 +558,9 @@ const LPAdmin = (() => {
 
   async function handleAdminLogin(event) {
     event.preventDefault();
-    const input = document.getElementById('adminPassword');
-    const error = document.getElementById('adminLoginError');
+    const input = $('adminPassword');
+    const error = $('adminLoginError');
+    const submit = event.target.querySelector('button[type="submit"]');
     const showError = (msg) => {
       if (error) {
         error.textContent = msg;
@@ -585,73 +568,70 @@ const LPAdmin = (() => {
       }
     };
 
-    if (!window.crypto?.subtle) {
-      showError('Tu navegador no permite verificar la contraseña en este contexto.');
-      return;
-    }
+    const token = input?.value || '';
+    if (!token) { showError('Escribe el token de administrador.'); return; }
 
-    const hash = await sha256(input?.value || '');
-    if (hash === ADMIN_PASSWORD_HASH) {
-      setAdminMode(true);
-      closeModal('adminLoginModal');
+    if (submit) submit.disabled = true;
+    try {
+      // Si la API acepta el token, la sesión queda iniciada
+      await api('/api/attendees?limit=1', { token });
+      adminToken = token;
+      saveToken(token);
       if (input) input.value = '';
-    } else {
-      showError('Contraseña incorrecta. Inténtalo de nuevo.');
-      input?.select();
+      if (error) error.classList.add('hidden');
+      closeModal('adminLoginModal');
+      setAdminMode(true);
+    } catch (e) {
+      showError(e.status === 401 ? 'Token incorrecto. Inténtalo de nuevo.' : e.message);
+      if (e.status === 401) input?.select();
+    } finally {
+      if (submit) submit.disabled = false;
     }
   }
 
   function openEditModal(id) {
     if (!isAdmin) return;
-    const item = mariaBAttendees.find((a) => a.id === id);
+    const item = attendees.find((a) => a.id === id);
     if (!item) return;
 
-    document.getElementById('editId').value = item.id;
-    document.getElementById('editTicketLabel').textContent = item.ticketNumber;
-    document.getElementById('editName').value = item.fullName;
-    document.getElementById('editEmail').value = item.email;
-    document.getElementById('editRole').value = item.role;
-    document.getElementById('editAttendance').value = item.attendanceType;
-    document.getElementById('editOrg').value = item.organization;
-    document.getElementById('editStatus').value = item.status;
+    $('editId').value = item.id;
+    $('editTicketLabel').textContent = item.ticket_number;
+    $('editName').value = item.full_name;
+    $('editEmail').value = item.email;
+    $('editRole').value = item.role;
+    $('editAttendance').value = item.attendance_type;
+    $('editOrg').value = item.organization;
+    $('editStatus').value = item.status;
     openModal('editModal');
   }
 
-  function handleEditSubmit(event) {
+  async function handleEditSubmit(event) {
     event.preventDefault();
     if (!isAdmin) return;
 
-    const id = document.getElementById('editId').value;
-    const item = mariaBAttendees.find((a) => a.id === id);
-    if (!item) return;
-
-    const name = document.getElementById('editName').value.trim();
-    const email = document.getElementById('editEmail').value.trim();
-    if (!name || !email) {
-      alert('Por favor completa todos los campos requeridos.');
+    const id = $('editId').value;
+    const name = $('editName').value.trim();
+    const email = $('editEmail').value.trim();
+    if (name.length < 3 || !email) {
+      alert('El nombre debe tener al menos 3 caracteres y el correo es obligatorio.');
       return;
     }
 
-    item.fullName = name;
-    item.email = email;
-    item.role = document.getElementById('editRole').value;
-    item.attendanceType = document.getElementById('editAttendance').value;
-    item.organization = document.getElementById('editOrg').value.trim() || 'UPTC Tunja';
-    item.status = document.getElementById('editStatus').value;
-
-    saveMariaBStorage();
-    filterAttendees();
-    closeModal('editModal');
+    const body = {
+      nombre: name,
+      correo: email,
+      rol: $('editRole').value,
+      modalidad: $('editAttendance').value,
+      organizacion: $('editOrg').value.trim() || 'UPTC Tunja',
+      status: $('editStatus').value
+    };
+    const ok = await runAction(
+      () => api('/api/attendees/' + encodeURIComponent(id), { method: 'PATCH', body }),
+      'No se pudo guardar. Revisa que el correo no esté repetido en otro asistente.'
+    );
+    if (ok) closeModal('editModal');
   }
 
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
   // Acciones disparadas por delegación de eventos desde el bootstrap
   const actions = {
     checkin: toggleCheckin,
@@ -661,7 +641,11 @@ const LPAdmin = (() => {
     filter: filterAttendees
   };
   return {
-    init() { initAdminSession(); initMariaBStorage(); },
+    init() {
+      try { localStorage.removeItem(LEGACY_LOCAL_KEY); } catch (e) { /* sin almacenamiento */ }
+      initAdminSession();
+      loadAttendees();
+    },
     act(name, id) { if (actions[name]) actions[name](id); },
     onRegisterSubmit: handleFormSubmit,
     onLoginSubmit: handleAdminLogin,
