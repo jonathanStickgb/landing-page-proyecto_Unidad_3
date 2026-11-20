@@ -243,8 +243,10 @@ const LPForm = (() => {
   }
 
   // Alterna entre formulario y mensaje de agradecimiento
-  function showThanks(name) {
+  function showThanks(name, ticket) {
     $('thanksName').textContent = name; // textContent: sin riesgo de XSS
+    if ($('thanksTicket')) $('thanksTicket').textContent = ticket || '';
+    $('thanksTicketBox')?.classList.toggle('hidden', !ticket);
     $('formThanks')?.classList.remove('hidden');
     $('attendeeForm')?.classList.add('hidden');
   }
@@ -254,10 +256,10 @@ const LPForm = (() => {
   }
 
   // Usuario convertido: guarda la marca, limpia el borrador y agradece
-  function markConverted(name) {
+  function markConverted(name, ticket) {
     clearDraft();
-    store.set(CONVERTED_KEY, JSON.stringify({ nombre: name, fecha: new Date().toISOString() }));
-    showThanks(name);
+    store.set(CONVERTED_KEY, JSON.stringify({ nombre: name, ticket: ticket || null, fecha: new Date().toISOString() }));
+    showThanks(name, ticket);
   }
 
   function init() {
@@ -275,7 +277,7 @@ const LPForm = (() => {
     restore();
     const converted = store.get(CONVERTED_KEY);
     if (converted) {
-      try { showThanks(JSON.parse(converted).nombre || ''); } catch (e) { store.remove(CONVERTED_KEY); }
+      try { const c = JSON.parse(converted); showThanks(c.nombre || '', c.ticket); } catch (e) { store.remove(CONVERTED_KEY); }
     }
   }
 
@@ -501,8 +503,9 @@ const LPAdmin = (() => {
     // Envío a la API (MariaDB) y a Formspree. Si falla, se conservan los datos del borrador.
     const submitBtn = event.target.querySelector('button[type="submit"]');
     if (submitBtn) submitBtn.disabled = true;
+    let ticket = null;
     try {
-      await LPForm.send({ nombre: name, correo: email, rol: role, modalidad: attendance, organizacion: org });
+      ticket = await LPForm.send({ nombre: name, correo: email, rol: role, modalidad: attendance, organizacion: org });
     } catch (err) {
       LPForm.setStatus(err.message || 'No pudimos enviar tu registro. Tus datos siguen guardados; inténtalo de nuevo.', true);
       if (submitBtn) submitBtn.disabled = false;
@@ -515,7 +518,7 @@ const LPAdmin = (() => {
 
     // Limpia el borrador, marca al usuario como convertido y muestra el agradecimiento
     event.target.reset();
-    LPForm.markConverted(name);
+    LPForm.markConverted(name, ticket);
   }
 
   /* ---------- Modo administrador ---------- */

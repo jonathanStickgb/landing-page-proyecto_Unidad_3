@@ -523,6 +523,10 @@
       <div id="formThanks" class="hidden text-sm space-y-3" role="status">
         <p class="text-lg font-bold text-[color:var(--color-ai-green)]">¡Gracias, <span id="thanksName"></span>!</p>
         <p class="text-[#d1c2b2]">Tu registro ya fue recibido. Revisa tu correo para la confirmación de tu acreditación.</p>
+        <div id="thanksTicketBox" class="hidden rounded-lg border border-[#f89820]/30 bg-[#f89820]/5 px-4 py-3">
+          <p class="text-xs text-[#a8998a] font-mono">Tu número de ticket (guárdalo para el acceso):</p>
+          <p id="thanksTicket" class="text-lg font-mono font-bold text-[#f89820] select-all"></p>
+        </div>
         <button type="button" id="formAnother" class="px-4 py-2 text-xs font-mono border border-white/15 rounded-lg text-[#f4efe8]">Registrar a otra persona</button>
       </div>
       <form id="attendeeForm" class="space-y-4 text-xs">
